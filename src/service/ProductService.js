@@ -50,10 +50,10 @@ export async function update(id, product) {
 
 /**
  *
- * @param {string} order
- * @param {'ASC' | 'DESC'} sort
- * @param {number} max
- * @param {number} offset
+ * @param {string | undefined} order
+ * @param {'ASC' | 'DESC' | undefined} sort
+ * @param {number | undefined} max
+ * @param {number | undefined} offset
  * @returns {Promise<Product[]>}
  */
 export async function list(order, sort, max, offset) {

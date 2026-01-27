@@ -71,14 +71,6 @@ export async function update(request, response) {
 export async function list(request, response) {
   try {
     const { order, sort, max, offset } = request.query
-    if (
-      typeof order !== 'string' ||
-      (sort !== 'ASC' && sort !== 'DESC') ||
-      typeof max !== 'number' ||
-      typeof offset !== 'number'
-    ) {
-      return response.status(400).json({ message: 'Bad Request' })
-    }
 
     const products = await productService.list(order, sort, max, offset)
     return response.json(products)
