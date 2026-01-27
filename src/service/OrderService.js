@@ -6,31 +6,49 @@ import { logger } from '../config/logger.js'
 import { Op } from 'sequelize'
 
 /**
+ * @typedef Product
+ * @property {number} id
+ * @property {string} name
+ * @property {number} quantity
+ *
+ * @typedef Order
+ * @property {number} id
+ * @property {number} totalAmount
+ * @property {string} status
+ * @property {Date} createdAt
+ * @property {Product[]} products
  *
  * @param {number} orderId
  * @param {number} userId
- * @returns
+ * @returns {Promise<Order | null>}
  */
 export async function get(orderId, userId) {
-  const order = await Order.findAll(
-    {
-      where: {
-        id: orderId,
-        userId: userId,
+  const order = await Order.findOne({
+    where: {
+      id: orderId,
+      user_id: userId,
+    },
+    attributes: ['id', 'totalAmount', 'status', 'createdAt'],
+    include: {
+      model: Product,
+      attributes: ['id', 'name'],
+      through: {
+        attributes: ['quantity'],
       },
     },
-    {
-      attributes: ['id', 'totalAmount', 'status', 'createdAt'],
-      include: {
-        model: Product,
-        attributes: ['id', 'name'],
-        through: {
-          attributes: ['quantity'],
-        },
-      },
-    }
-  )
-  return order
+  })
+  if (order === null) return null
+  return {
+    id: order.id,
+    totalAmount: order.totalAmount,
+    status: order.status,
+    createdAt: order.createdAt,
+    products: order.Products.map((p) => ({
+      id: p.id,
+      name: p.name,
+      quantity: p.ProductOrder.quantity,
+    })),
+  }
 }
 
 /**
@@ -40,7 +58,7 @@ export async function get(orderId, userId) {
  * @param {'ASC' | 'DESC'} sort
  * @param {number} limit
  * @param {number} offset
- * @returns
+ * @returns {Promise<Omit<Order, 'products'>[]>}
  */
 export async function list(userId, order, sort, limit, offset) {
   const orders = await Order.findAll({
@@ -50,6 +68,7 @@ export async function list(userId, order, sort, limit, offset) {
     order: [[order || 'id', sort || 'ASC']],
     limit: limit || 10,
     offset: offset || 0,
+    attributes: ['id', 'totalAmount', 'status', 'createdAt'],
   })
   return orders
 }
@@ -59,7 +78,7 @@ export async function list(userId, order, sort, limit, offset) {
  * @param {string} sessionId
  * @param {{cart: cartItem[]}} sessionData
  * @param {number} userId
- * @returns
+ * @returns {Promise<products>}
  */
 export async function create(sessionId, sessionData, userId) {
   const cart = sessionData.cart
@@ -80,8 +99,7 @@ export async function create(sessionId, sessionData, userId) {
     },
   })
 
-  /** @type {number} */
-  const totalAmount = products.reduce((acc, product) => acc + product.price, 0.0)
+  const totalAmount = products.reduce((acc, product) => acc + product.price * product.quantity, 0.0)
 
   logger.debug({
     message: 'Processing products in the cart to a new order',
@@ -107,5 +125,5 @@ export async function create(sessionId, sessionData, userId) {
   )
   await redisClient.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), { EX: 60 * 60 * 2 })
 
-  return order
+  return await get(order.id, userId)
 }

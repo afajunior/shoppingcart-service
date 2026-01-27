@@ -1,6 +1,12 @@
 import ShoppingCartException from '../error/ShoppingCartException.js'
 import * as authService from '../service/AuthService.js'
 
+/**
+ * 
+ * @param {import('express').Request} request 
+ * @param {import('express').Response} response 
+ * @returns {Promise<import('express').Response>}
+ */
 export async function register(request, response) {
   try {
     const user = await authService.register(request.body)
@@ -16,6 +22,12 @@ export async function register(request, response) {
   }
 }
 
+/**
+ * 
+ * @param {import('express').Request} request 
+ * @param {import('express').Response} response 
+ * @returns {Promise<import('express').Response>}
+ */
 export async function login(request, response) {
   try {
     const { username, password } = request.body

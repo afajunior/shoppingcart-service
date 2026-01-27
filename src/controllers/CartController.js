@@ -5,7 +5,7 @@ import * as cartService from '../service/CartService.js'
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
- * @returns
+ * @returns {Promise<import('express').Response>}
  */
 export async function get(request, response) {
   try {
@@ -19,7 +19,7 @@ export async function get(request, response) {
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
- * @returns
+ * @returns {Promise<import('express').Response>}
  */
 export async function add(request, response) {
   try {

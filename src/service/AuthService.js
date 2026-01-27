@@ -7,17 +7,13 @@ import { v4 as uuid } from 'uuid'
 import { redisClient } from '../config/redis.js'
 
 /**
- * @typedef UserDTO
+ * @typedef User
  * @property {number} id
  * @property {string} username
- * @property {string} password
  * @property {string} email
- */
-
-/**
- *
- * @param {UserDTO} user
- * @returns {Promise<UserDTO>}
+ * 
+ * @param {User} user
+ * @returns {Promise<User>}
  */
 export async function register(user) {
   const existedUsername = await User.findOne({
@@ -38,7 +34,7 @@ export async function register(user) {
     throw new ShoppingCartException(400, 'This email is already registered')
   }
   logger.info(`Registering user ${JSON.stringify({ username: user.username, email: user.email })}`)
-  return await User.build(user).save()
+  return await User.create(user)
 }
 
 /**

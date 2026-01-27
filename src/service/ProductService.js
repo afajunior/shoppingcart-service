@@ -2,9 +2,14 @@ import { logger } from '../config/logger.js'
 import { Product } from '../entities/index.js'
 
 /**
- * @typedef {{id: number, name: string, price: number, quantity: string}} Product
+ * @typedef Product
+ * @property {number} id
+ * @property {string} name
+ * @property {number} price
+ * @property {number} quantity
+ *
  * @param {number} productId
- * @returns {Promise<Product>}
+ * @returns {Promise<Product | null>}
  */
 export async function get(productId) {
   return await Product.findByPk(productId, {
@@ -21,14 +26,14 @@ export async function save(product) {
   const createdProduct = await Product.build(product).save()
 
   logger.info(`Saved product#${createdProduct.id} to the database`)
-  return createdProduct
+  return { id: createdProduct.id, ...product }
 }
 
 /**
  *
  * @param {number} id
  * @param {Omit<Product, 'id'>} product
- * @returns {Promise<Product>}
+ * @returns {Promise<Product | null>}
  */
 export async function update(id, product) {
   const affectedCount = await Product.update(product, {
@@ -57,14 +62,10 @@ export async function update(id, product) {
  * @returns {Promise<Product[]>}
  */
 export async function list(order, sort, max, offset) {
-  return await Product.findAll(
-    {
-      order: [[order || 'id', sort || 'ASC']],
-      limit: max || 10,
-      offset: offset || 0,
-    },
-    {
-      attributes: ['id', 'name', 'price', 'quantity'],
-    }
-  )
+  return await Product.findAll({
+    order: [[order || 'id', sort || 'ASC']],
+    limit: max || 10,
+    offset: offset || 0,
+    attributes: ['id', 'name', 'price', 'quantity'],
+  })
 }
