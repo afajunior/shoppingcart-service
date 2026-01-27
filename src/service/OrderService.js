@@ -1,0 +1,111 @@
+import { redisClient } from '../config/redis.js'
+import Order from '../entities/Order.js'
+import Product from '../entities/Product.js'
+import ShoppingCartException from '../error/ShoppingCartException.js'
+import { logger } from '../config/logger.js'
+import { Op } from 'sequelize'
+
+/**
+ *
+ * @param {number} orderId
+ * @param {number} userId
+ * @returns
+ */
+export async function get(orderId, userId) {
+  const order = await Order.findAll(
+    {
+      where: {
+        id: orderId,
+        userId: userId,
+      },
+    },
+    {
+      attributes: ['id', 'totalAmount', 'status', 'createdAt'],
+      include: {
+        model: Product,
+        attributes: ['id', 'name'],
+        through: {
+          attributes: ['quantity'],
+        },
+      },
+    }
+  )
+  return order
+}
+
+/**
+ *
+ * @param {number} userId
+ * @param {string} order
+ * @param {'ASC' | 'DESC'} sort
+ * @param {number} limit
+ * @param {number} offset
+ * @returns
+ */
+export async function list(userId, order, sort, limit, offset) {
+  const orders = await Order.findAll({
+    where: {
+      user_id: userId,
+    },
+    order: [[order || 'id', sort || 'ASC']],
+    limit: limit || 10,
+    offset: offset || 0,
+  })
+  return orders
+}
+
+/**
+ * @typedef {{productId: number, quantity: number}} cartItem
+ * @param {string} sessionId
+ * @param {{cart: cartItem[]}} sessionData
+ * @param {number} userId
+ * @returns
+ */
+export async function create(sessionId, sessionData, userId) {
+  const cart = sessionData.cart
+
+  if (cart === null) {
+    throw new ShoppingCartException(404, 'Cart not found')
+  }
+
+  if (cart.length === 0) {
+    throw new ShoppingCartException(400, 'Empty Cart')
+  }
+
+  const products = await Product.findAll({
+    where: {
+      id: {
+        [Op.in]: cart.map((item) => item.productId),
+      },
+    },
+  })
+
+  /** @type {number} */
+  const totalAmount = products.reduce((acc, product) => acc + product.price, 0.0)
+
+  logger.debug({
+    message: 'Processing products in the cart to a new order',
+    products,
+    totalAmount,
+  })
+
+  const order = await Order.create({
+    totalAmount,
+    user_id: userId,
+  })
+
+  await Promise.all(
+    products.map((p) => {
+      const quantity = cart.find((item) => p.id === item.productId).quantity
+      order.addProduct(p, {
+        through: {
+          quantity: quantity,
+        },
+      })
+      p.decrement('quantity', { by: quantity })
+    })
+  )
+  await redisClient.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), { EX: 60 * 60 * 2 })
+
+  return order
+}

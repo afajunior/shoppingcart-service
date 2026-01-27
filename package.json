@@ -1,0 +1,37 @@
+{
+  "name": "shoppingcart",
+  "version": "1.0.0",
+  "description": "A shopping cart management",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node -r dotenv/config -r ./src/config/tracing.js src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.69.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-joi-validation": "^6.1.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.17.2",
+    "pg-hstore": "^2.3.4",
+    "redis": "^5.10.0",
+    "sequelize": "^6.37.7",
+    "uuid": "^13.0.0",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2",
+    "globals": "^17.0.0",
+    "prettier": "^3.8.0"
+  }
+}
