@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node -r dotenv/config -r ./src/config/tracing.js src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:unit": "jest",
     "format": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -29,9 +29,11 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.28.6",
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "globals": "^17.0.0",
+    "jest": "^30.2.0",
     "prettier": "^3.8.0"
   }
 }

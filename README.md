@@ -4,6 +4,7 @@
 - Tests (JUnit)
 - CI/CD with Github Action
 - OpenAPI maybe?
+- Implement roles to allow only admin users to create and update products
 
 # READING
 

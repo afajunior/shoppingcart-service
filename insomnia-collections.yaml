@@ -12,7 +12,7 @@ collection:
       modified: 1769090272619
       sortKey: -1769090272619
     children:
-      - url: "{{ _.baseurl }}/register"
+      - url: '{{ _.baseurl }}/register'
         name: Register
         meta:
           id: req_914e3c8bd3b44d3fbdc969f824c64aaa
@@ -42,7 +42,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/login"
+      - url: '{{ _.baseurl }}/login'
         name: Login
         meta:
           id: req_375e4d57bb2646a1acd2eabf1ceca38f
@@ -78,7 +78,7 @@ collection:
       modified: 1769090284093
       sortKey: -1769090284093
     children:
-      - url: "{{ _.baseurl }}/product/1"
+      - url: '{{ _.baseurl }}/product/1'
         name: Get
         meta:
           id: req_c2a91d6905d6434a931b515f746e5a5e
@@ -102,7 +102,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/product"
+      - url: '{{ _.baseurl }}/product'
         name: Create
         meta:
           id: req_186a39d6568b4d77ae95726ff3acbfed
@@ -136,7 +136,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/product/1"
+      - url: '{{ _.baseurl }}/product/1'
         name: Update
         meta:
           id: req_15a5779acebb4525ad71de6bb7dc4cc5
@@ -170,7 +170,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/product"
+      - url: '{{ _.baseurl }}/product'
         name: List
         meta:
           id: req_6222eb47838b42289815b685d7100dec
@@ -206,7 +206,7 @@ collection:
       modified: 1769104761897
       sortKey: -1769104761897
     children:
-      - url: "{{ _.baseurl }}/cart"
+      - url: '{{ _.baseurl }}/cart'
         name: Add Product
         meta:
           id: req_79cf7e35e75f49619480f8b94aa9a1cd
@@ -239,7 +239,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/cart"
+      - url: '{{ _.baseurl }}/cart'
         name: Get
         meta:
           id: req_f98b86191d2c4ccaaf7a3f58edffab04
@@ -270,7 +270,7 @@ collection:
       modified: 1769536231059
       sortKey: -1769536231059
     children:
-      - url: "{{ _.baseurl }}/order"
+      - url: '{{ _.baseurl }}/order'
         name: Create
         meta:
           id: req_e4a406e3824248bda58d3566e41939a9
@@ -294,7 +294,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/order"
+      - url: '{{ _.baseurl }}/order'
         name: List
         meta:
           id: req_48b2b4e149a04a688872dc2fc59986c1
@@ -318,7 +318,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.baseurl }}/order/1"
+      - url: '{{ _.baseurl }}/order/1'
         name: Get
         meta:
           id: req_48565fcbedf44620ac554d72c8822f38
