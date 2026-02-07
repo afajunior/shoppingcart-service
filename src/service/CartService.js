@@ -1,7 +1,9 @@
-import { logger } from '../config/logger.js'
-import { redisClient } from '../config/redis.js'
-import { Product } from '../entities/index.js'
-import ShoppingCartException from '../error/ShoppingCartException.js'
+import HTTPException from '../error/HTTPException.js'
+import { logger } from '../infrastructure/logger.js'
+import { redisClient } from '../infrastructure/redis.js'
+import db from '../infrastructure/database.cjs'
+
+const { Product } = await db
 
 /**
  * @typedef {{productId: number, quantity: number}} cartItem
@@ -28,7 +30,7 @@ export async function add(sessionId, sessionData, productId, quantity) {
   } else {
     const product = await Product.findByPk(productId)
     if (existingItem.quantity > product.quantity) {
-      throw new ShoppingCartException(400, 'Quantity exceed local inventory')
+      throw new HTTPException(400, 'Quantity exceed local inventory')
     }
   }
 

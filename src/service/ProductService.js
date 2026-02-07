@@ -1,5 +1,7 @@
-import { logger } from '../config/logger.js'
-import { Product } from '../entities/index.js'
+import { logger } from '../infrastructure/logger.js'
+import db from '../infrastructure/database.cjs'
+
+const { Product } = await db
 
 /**
  * @typedef Product

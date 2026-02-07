@@ -11,7 +11,7 @@ import {
   productBodySchema,
   searchParamsSchema,
   registerSchema,
-} from './config/validator.js'
+} from './infrastructure/validator.js'
 import { auth } from './middlewares/AuthMiddleware.js'
 
 const app = express()

@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
-import { redisClient } from '../config/redis.js'
-import { logger } from '../config/logger.js'
+import { redisClient } from '../infrastructure/redis.js'
+import { logger } from '../infrastructure/logger.js'
 
 /**
  *

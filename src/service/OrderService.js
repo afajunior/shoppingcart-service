@@ -1,9 +1,10 @@
-import { redisClient } from '../config/redis.js'
-import Order from '../entities/Order.js'
-import Product from '../entities/Product.js'
-import ShoppingCartException from '../error/ShoppingCartException.js'
-import { logger } from '../config/logger.js'
+import { redisClient } from '../infrastructure/redis.js'
+import { logger } from '../infrastructure/logger.js'
 import { Op } from 'sequelize'
+import db from '../infrastructure/database.cjs'
+import HTTPException from '../error/HTTPException.js'
+
+const { Order, Product } = await db
 
 /**
  * @typedef Product
@@ -84,11 +85,11 @@ export async function create(sessionId, sessionData, userId) {
   const cart = sessionData.cart
 
   if (cart === null) {
-    throw new ShoppingCartException(404, 'Cart not found')
+    throw new HTTPException(404, 'Cart not found')
   }
 
   if (cart.length === 0) {
-    throw new ShoppingCartException(400, 'Empty Cart')
+    throw new HTTPException(400, 'Empty Cart')
   }
 
   const products = await Product.findAll({

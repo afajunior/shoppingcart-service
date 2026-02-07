@@ -1,4 +1,4 @@
-import ShoppingCartException from '../error/ShoppingCartException.js'
+import HTTPException from '../error/HTTPException.js'
 import * as cartService from '../service/CartService.js'
 
 /**
@@ -28,7 +28,7 @@ export async function add(request, response) {
     const cart = await cartService.add(sessionId, sessionData, productId, quantity)
     return response.json(cart)
   } catch (error) {
-    if (error instanceof ShoppingCartException) {
+    if (error instanceof HTTPException) {
       return response.status(error.status).json({ message: error.message })
     }
     if (error instanceof Error) {
