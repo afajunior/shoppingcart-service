@@ -1,5 +1,5 @@
 import HTTPException from '../error/HTTPException.js'
-import * as authService from '../service/AuthService.js'
+import { createAuthService } from '../service/AuthService.js'
 
 /**
  *
@@ -9,6 +9,7 @@ import * as authService from '../service/AuthService.js'
  */
 export async function register(request, response) {
   try {
+    const authService = await createAuthService()
     const user = await authService.register(request.body)
     return response.status(200).json({ message: `User ${user.username} successfully registered` })
   } catch (error) {
@@ -30,6 +31,7 @@ export async function register(request, response) {
  */
 export async function login(request, response) {
   try {
+    const authService = await createAuthService()
     const { username, password } = request.body
     const token = await authService.login(username, password)
     response.status(200).json({ token })

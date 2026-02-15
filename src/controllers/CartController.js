@@ -1,5 +1,5 @@
 import HTTPException from '../error/HTTPException.js'
-import * as cartService from '../service/CartService.js'
+import { createCartService } from '../service/CartService.js'
 
 /**
  *
@@ -23,6 +23,7 @@ export async function get(request, response) {
  */
 export async function add(request, response) {
   try {
+    const cartService = await createCartService()
     const { productId, quantity } = request.body
     const { sessionId, sessionData } = request.session
     const cart = await cartService.add(sessionId, sessionData, productId, quantity)

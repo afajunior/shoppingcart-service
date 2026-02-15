@@ -1,17 +1,18 @@
 import HTTPException from '../error/HTTPException.js'
 import { logger } from '../infrastructure/logger.js'
-import { redisClient } from '../infrastructure/redis.js'
+import { initializeRedis } from '../infrastructure/redis.js'
 import db from '../infrastructure/database.cjs'
 
-const { Product } = await db
+/**
+ * @typedef {productId: number, quantity: number} cartItem
+ */
 
-function createCartService(deps = {}) {
-  const { loggerInstance = logger, redis = redisClient } = deps
+export async function createCartService(deps = {}) {
+  const { productModel = (await db()).Product, loggerInstance = logger, redis = await initializeRedis() } = deps
   return {
     /**
-     * @typedef {{productId: number, quantity: number}} cartItem
      * @param {string} sessionId
-     * @param {{cart: cartItem[]}} sessionData
+     * @param {cart: cartItem[]} sessionData
      * @param {number} productId
      * @param {number} quantity
      * @returns {Promise<{cart: cartItem[]}>}
@@ -31,7 +32,7 @@ function createCartService(deps = {}) {
         const itemIdx = cart.indexOf(existingItem)
         cart.splice(itemIdx)
       } else {
-        const product = await Product.findByPk(productId)
+        const product = await productModel.findByPk(productId)
         if (existingItem.quantity > product.quantity) {
           throw new HTTPException(400, 'Quantity exceed local inventory')
         }
@@ -45,6 +46,3 @@ function createCartService(deps = {}) {
     },
   }
 }
-
-const cartService = createCartService()
-export const { add } = cartService

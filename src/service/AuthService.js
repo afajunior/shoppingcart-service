@@ -1,19 +1,28 @@
-// AuthService.js - VOLTA AO ORIGINAL!
 import { compare } from 'bcrypt'
 import { logger } from '../infrastructure/logger.js'
 import db from '../infrastructure/database.cjs'
 import HTTPException from '../error/HTTPException.js'
 import jwt from 'jsonwebtoken'
 import { v4 as uuid } from 'uuid'
-import { redisClient } from '../infrastructure/redis.js'
+import { initializeRedis } from '../infrastructure/redis.js'
 
-const { User } = await db
-
-function createAuthService(deps = {}) {
+/**
+ * @typedef dependency
+ * @property {User} userModel
+ * @property {import('winston').Logger} loggerInstance
+ * @property {import('redis').RedisClientType} redis
+ * @property {import('jsonwebtoken').jwt} jwtLib
+ * @property {import('bcrypt').compare} compareLib
+ * @property {import('uuid').v4} uuidLib
+ *
+ * @param {dependency} deps
+ * @returns
+ */
+export async function createAuthService(deps = {}) {
   const {
-    userModel = User,
+    userModel = (await db()).User,
     loggerInstance = logger,
-    redis = redisClient,
+    redis = await initializeRedis(),
     jwtLib = jwt,
     compareLib = compare,
     uuidLib = uuid,
@@ -25,7 +34,7 @@ function createAuthService(deps = {}) {
         where: { username: user.username },
       })
       if (existedUsername !== null) {
-        throw new HTTPException(400, 'The username already existed')
+        throw new HTTPException(400, 'The username already exists')
       }
 
       const existedEmail = await userModel.findOne({
@@ -45,12 +54,12 @@ function createAuthService(deps = {}) {
         where: { username: username },
       })
       if (user === null) {
-        throw new HTTPException(400, 'User not found')
+        throw new HTTPException(404, 'User not found')
       }
 
       const isMatch = await compareLib(password, user.password)
       if (!isMatch) {
-        throw new HTTPException(400, 'Invalid credentials')
+        throw new HTTPException(403, 'Invalid credentials')
       }
 
       loggerInstance.info(`User ${username} authenticated.`)
@@ -71,6 +80,3 @@ function createAuthService(deps = {}) {
     },
   }
 }
-
-const authService = createAuthService()
-export const { register, login } = authService

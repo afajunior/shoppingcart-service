@@ -1,4 +1,4 @@
-import * as productService from '../service/ProductService.js'
+import { createProductService } from '../service/ProductService.js'
 
 /**
  * @param {import('express').Request} request
@@ -7,6 +7,7 @@ import * as productService from '../service/ProductService.js'
  */
 export async function get(request, response) {
   try {
+    const productService = await createProductService()
     const { id } = request.params
     if (typeof id !== 'number') {
       return response.status(400).json({ message: 'Bad Request' })
@@ -29,6 +30,7 @@ export async function get(request, response) {
  */
 export async function save(request, response) {
   try {
+    const productService = await createProductService()
     const product = await productService.save(request.body)
     return response.json(product)
   } catch (error) {
@@ -43,6 +45,7 @@ export async function save(request, response) {
  * @returns {Promise<import('express').Response>}
  */
 export async function update(request, response) {
+  const productService = await createProductService()
   const id = request.params.id
 
   if (typeof id !== 'number') {
@@ -70,6 +73,7 @@ export async function update(request, response) {
  */
 export async function list(request, response) {
   try {
+    const productService = await createProductService()
     const { order, sort, max, offset } = request.query
 
     const products = await productService.list(order, sort, max, offset)

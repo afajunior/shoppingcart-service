@@ -1,27 +1,28 @@
-import { redisClient } from '../infrastructure/redis.js'
+import { initializeRedis } from '../infrastructure/redis.js'
 import { logger } from '../infrastructure/logger.js'
 import { Op } from 'sequelize'
 import db from '../infrastructure/database.cjs'
 import HTTPException from '../error/HTTPException.js'
 
-const { Order, Product } = await db
+/**
+ * @typedef Product
+ * @property {number} id
+ * @property {string} name
+ * @property {number} quantity
+ *
+ * @typedef Order
+ * @property {number} id
+ * @property {number} totalAmount
+ * @property {string} status
+ * @property {Date} createdAt
+ * @property {Product[]} products
+ */
 
-function createOrderService(deps = {}) {
-  const { loggerInstance = logger, redis = redisClient } = deps
+export async function createOrderService(deps = {}) {
+  const { dbInstance = await db(), loggerInstance = logger, redis = await initializeRedis() } = deps
+  const { Order, Product, sequelize } = dbInstance
   return {
     /**
-     * @typedef Product
-     * @property {number} id
-     * @property {string} name
-     * @property {number} quantity
-     *
-     * @typedef Order
-     * @property {number} id
-     * @property {number} totalAmount
-     * @property {string} status
-     * @property {Date} createdAt
-     * @property {Product[]} products
-     *
      * @param {number} orderId
      * @param {number} userId
      * @returns {Promise<Order | null>}
@@ -41,7 +42,10 @@ function createOrderService(deps = {}) {
           },
         },
       })
-      if (order === null) return null
+      if (order === null) {
+        throw new HTTPException(404, 'Order not found')
+      }
+
       return {
         id: order.id,
         totalAmount: order.totalAmount,
@@ -58,7 +62,7 @@ function createOrderService(deps = {}) {
     /**
      *
      * @param {number} userId
-     * @param {string} order
+     * @param {string} order'
      * @param {'ASC' | 'DESC'} sort
      * @param {number} limit
      * @param {number} offset
@@ -87,7 +91,7 @@ function createOrderService(deps = {}) {
     async create(sessionId, sessionData, userId) {
       const cart = sessionData.cart
 
-      if (cart === null) {
+      if (!cart) {
         throw new HTTPException(404, 'Cart not found')
       }
 
@@ -111,28 +115,41 @@ function createOrderService(deps = {}) {
         totalAmount,
       })
 
-      const order = await Order.create({
-        totalAmount,
-        user_id: userId,
+      const order = await sequelize.transaction(async (transaction) => {
+        const newOrder = await Order.create(
+          {
+            totalAmount,
+            user_id: userId,
+          },
+          { transaction }
+        )
+
+        const quantityMap = cart.reduce((acc, item) => {
+          acc[item.productId] = item.quantity
+          return acc
+        }, {})
+
+        await Promise.all(
+          products.map(async (product) => {
+            const quantity = quantityMap[product.id]
+
+            await newOrder.addProduct(product, {
+              through: { quantity },
+              transaction,
+            })
+
+            await product.decrement('quantity', {
+              by: quantity,
+              transaction,
+            })
+          })
+        )
+
+        return newOrder
       })
 
-      await Promise.all(
-        products.map((p) => {
-          const quantity = cart.find((item) => p.id === item.productId).quantity
-          order.addProduct(p, {
-            through: {
-              quantity: quantity,
-            },
-          })
-          p.decrement('quantity', { by: quantity })
-        })
-      )
       await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), { EX: 60 * 60 * 2 })
-
-      return await get(order.id, userId)
+      return await this.get(order.id, userId)
     },
   }
 }
-
-const orderService = createOrderService()
-export const { create, get, list } = orderService

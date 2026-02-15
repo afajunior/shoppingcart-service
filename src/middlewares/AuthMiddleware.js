@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { redisClient } from '../infrastructure/redis.js'
+import { initializeRedis } from '../infrastructure/redis.js'
 import { logger } from '../infrastructure/logger.js'
 
 /**
@@ -10,6 +10,7 @@ import { logger } from '../infrastructure/logger.js'
  * @returns
  */
 export async function auth(request, response, next) {
+  const redisClient = await initializeRedis()
   const token = request.header('Authorization')?.split(' ')[1]
   if (!token) {
     return response.status(401).json({ message: 'Access denied. No token provided' })

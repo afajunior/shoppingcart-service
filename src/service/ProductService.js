@@ -1,10 +1,9 @@
 import { logger } from '../infrastructure/logger.js'
 import db from '../infrastructure/database.cjs'
+import HTTPException from '../error/HTTPException.js'
 
-const { Product } = await db
-
-function createProductService(deps = {}) {
-  const { loggerInstance = logger } = deps
+export async function createProductService(deps = {}) {
+  const { productModel = (await db()).Product, loggerInstance = logger } = deps
   return {
     /**
      * @typedef Product
@@ -17,7 +16,7 @@ function createProductService(deps = {}) {
      * @returns {Promise<Product | null>}
      */
     async get(productId) {
-      return await Product.findByPk(productId, {
+      return await productModel.findByPk(productId, {
         attributes: ['id', 'name', 'price', 'quantity'],
       })
     },
@@ -28,7 +27,7 @@ function createProductService(deps = {}) {
      * @returns {Promise<Product>}
      */
     async save(product) {
-      const createdProduct = await Product.build(product).save()
+      const createdProduct = await productModel.create(product)
 
       loggerInstance.info(`Saved product#${createdProduct.id} to the database`)
       return { id: createdProduct.id, ...product }
@@ -41,7 +40,7 @@ function createProductService(deps = {}) {
      * @returns {Promise<Product | null>}
      */
     async update(id, product) {
-      const affectedCount = await Product.update(product, {
+      const affectedCount = await productModel.update(product, {
         where: {
           id,
         },
@@ -50,12 +49,10 @@ function createProductService(deps = {}) {
       loggerInstance.info(`Updated product#${id}. Rows updated: ${affectedCount}`)
 
       if (affectedCount[0] === 0) {
-        return null
+        throw new HTTPException(404, 'Product Not Found')
       }
 
-      return await Product.findByPk(id, {
-        attributes: ['id', 'name', 'price', 'quantity'],
-      })
+      return await this.get(id)
     },
 
     /**
@@ -67,7 +64,7 @@ function createProductService(deps = {}) {
      * @returns {Promise<Product[]>}
      */
     async list(order, sort, max, offset) {
-      return await Product.findAll({
+      return await productModel.findAll({
         order: [[order || 'id', sort || 'ASC']],
         limit: max || 10,
         offset: offset || 0,
@@ -76,6 +73,3 @@ function createProductService(deps = {}) {
     },
   }
 }
-
-const productService = createProductService()
-export const { get, list, save, update } = productService
