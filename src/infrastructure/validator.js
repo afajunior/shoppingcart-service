@@ -11,6 +11,10 @@ export const loginSchema = Joi.object({
   password: Joi.string().min(6).max(32).required(),
 })
 
+export const verifyEmailSchema = Joi.object({
+  token: Joi.string().required().min(32).max(32),
+})
+
 export const searchParamsSchema = Joi.object({
   order: Joi.string(),
   sort: Joi.string().valid('ASC', 'DESC'),

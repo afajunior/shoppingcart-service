@@ -11,6 +11,7 @@ import {
   productBodySchema,
   searchParamsSchema,
   registerSchema,
+  verifyEmailSchema,
 } from './infrastructure/validator.js'
 import { auth } from './middlewares/AuthMiddleware.js'
 
@@ -19,9 +20,11 @@ app.use(express.json())
 
 const validator = createValidator({})
 
-// Login
+// Auth
 app.post('/register', validator.body(registerSchema), authController.register)
 app.post('/login', validator.body(loginSchema), authController.login)
+app.get('/verify-email', validator.body(verifyEmailSchema), authController.verifyEmail)
+app.post('/resend-token', auth, authController.sendVerificationEmail)
 
 // Product
 app.get('/product/:id', auth, validator.params(paramSchema), productController.get)

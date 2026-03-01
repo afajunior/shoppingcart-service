@@ -5,6 +5,7 @@ import HTTPException from '../error/HTTPException.js'
 import jwt from 'jsonwebtoken'
 import { v4 as uuid } from 'uuid'
 import { initializeRedis } from '../infrastructure/redis.js'
+import { createEmailService } from './EmailService.js'
 
 /**
  * @typedef dependency
@@ -26,6 +27,7 @@ export async function createAuthService(deps = {}) {
     jwtLib = jwt,
     compareLib = compare,
     uuidLib = uuid,
+    emailService = await createEmailService(),
   } = deps
 
   const { User, Role, sequelize } = dbInstance
@@ -49,7 +51,7 @@ export async function createAuthService(deps = {}) {
 
       loggerInstance.info(`Registering user ${JSON.stringify({ username: user.username, email: user.email })}`)
 
-      return await sequelize.transaction(async (transaction) => {
+      const newUser = await sequelize.transaction(async (transaction) => {
         const [roleUser, newUser] = await Promise.all([
           Role.findOne({ where: { name: 'USER' }, transaction }),
           User.create(user, { transaction }),
@@ -59,6 +61,10 @@ export async function createAuthService(deps = {}) {
 
         return newUser
       })
+
+      await emailService.sendVerificationEmail(newUser.id)
+
+      return newUser
     },
 
     async login(username, password) {
@@ -88,6 +94,30 @@ export async function createAuthService(deps = {}) {
 
       return jwtLib.sign({ userId: user.id, sessionId }, process.env.JWT_SECRET, {
         expiresIn: '2h',
+      })
+    },
+
+    async verifyEmail(token) {
+      const user = await User.findOne({
+        where: { emailTokenVerify: token },
+      })
+
+      if (!user) {
+        throw new HTTPException(404, 'Invalid token')
+      }
+
+      if (user.emailVerifyAt) {
+        throw new HTTPException(409, 'Email already verified')
+      }
+
+      if (new Date() > user.emailTokenExpiresAt) {
+        throw new HTTPException(410, 'Token expired')
+      }
+
+      await user.update({
+        emailVerifyAt: new Date(),
+        emailTokenVerify: null,
+        emailTokenExpiresAt: null,
       })
     },
   }

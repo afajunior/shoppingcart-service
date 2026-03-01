@@ -15,6 +15,10 @@ const dbInstanceMock = {
   },
 }
 
+const emailServiceMock = {
+  sendVerificationEmail: jest.fn(),
+}
+
 const jwtLibMock = {
   sign: jest.fn(),
 }
@@ -34,6 +38,7 @@ const authService = await createAuthService({
     info: jest.fn(),
     error: jest.fn(),
   },
+  emailService: emailServiceMock,
 })
 
 describe('AuthService.Register', () => {
@@ -86,6 +91,7 @@ describe('AuthService.Register', () => {
     const user = await authService.register(newUser)
 
     expect(user).toBe(savedUser)
+    expect(emailServiceMock.sendVerificationEmail).toHaveBeenCalledWith(savedUser.id)
   })
 
   it('should throw error if the username exists', async () => {

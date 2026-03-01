@@ -33,6 +33,21 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
       },
+      emailTokenVerify: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'email_token_verify',
+      },
+      emailTokenExpiresAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: 'email_token_expires_at',
+      },
+      emailVerifyAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+        field: 'email_verify_at',
+      },
     },
     {
       sequelize,
