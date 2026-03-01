@@ -2,10 +2,19 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { createAuthService } from '../src/service/AuthService'
 import HTTPException from '../src/error/HTTPException'
 
-const userModelMock = {
-  findOne: jest.fn(),
-  create: jest.fn(),
+const dbInstanceMock = {
+  User: {
+    findOne: jest.fn(),
+    create: jest.fn(),
+  },
+  Role: {
+    findOne: jest.fn(),
+  },
+  sequelize: {
+    transaction: jest.fn(),
+  },
 }
+
 const jwtLibMock = {
   sign: jest.fn(),
 }
@@ -16,7 +25,7 @@ const compareMock = jest.fn()
 const uuidLibMock = jest.fn()
 
 const authService = await createAuthService({
-  userModel: userModelMock,
+  dbInstance: dbInstanceMock,
   jwtLib: jwtLibMock,
   redis: redisMock,
   compareLib: compareMock,
@@ -31,7 +40,7 @@ describe('AuthService.Register', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    userModelMock.findOne.mockImplementation(async (arg) => {
+    dbInstanceMock.User.findOne.mockImplementation(async (arg) => {
       const { where } = arg
       const { username, email } = where
       if (username === 'duplicate_username') {
@@ -56,12 +65,26 @@ describe('AuthService.Register', () => {
     }
     const savedUser = {
       id: 1,
+      addRole: jest.fn(),
       ...newUser,
     }
+    const roleMock = {
+      id: 1,
+      name: 'MOCK_ROLE',
+    }
 
-    userModelMock.create.mockResolvedValue(savedUser)
+    dbInstanceMock.User.create.mockResolvedValue(savedUser)
+    dbInstanceMock.Role.findOne.mockResolvedValue(roleMock)
+    dbInstanceMock.sequelize.transaction.mockImplementation(async (args) => {
+      const transactionMock = {}
+      await args(transactionMock)
+
+      expect(savedUser.addRole).toHaveBeenCalledWith(roleMock, { transaction: transactionMock })
+      return savedUser
+    })
 
     const user = await authService.register(newUser)
+
     expect(user).toBe(savedUser)
   })
 
@@ -73,7 +96,7 @@ describe('AuthService.Register', () => {
     await expect(authService.register(duplicateUsername)).rejects.toMatchObject(
       new HTTPException(400, 'The username already exists')
     )
-    expect(userModelMock.create).not.toHaveBeenCalled()
+    expect(dbInstanceMock.User.create).not.toHaveBeenCalled()
   })
 
   it('should throw error if the email exists', async () => {
@@ -84,7 +107,7 @@ describe('AuthService.Register', () => {
     await expect(authService.register(duplicateEmail)).rejects.toMatchObject(
       new HTTPException(400, 'This email is already registered')
     )
-    expect(userModelMock.create).not.toHaveBeenCalled()
+    expect(dbInstanceMock.User.create).not.toHaveBeenCalled()
   })
 })
 describe('AuthService.Login', () => {
@@ -108,7 +131,7 @@ describe('AuthService.Login', () => {
     process.env.CART_EXPIRATION_TIME = 123456
 
     uuidLibMock.mockReturnValueOnce(sessionId)
-    userModelMock.findOne.mockResolvedValue(newUser)
+    dbInstanceMock.User.findOne.mockResolvedValue(newUser)
     compareMock.mockResolvedValue(true)
     jwtLibMock.sign.mockImplementation(async (obj, secret, opts) => {
       expect(obj).toMatchObject({ userId, sessionId })
@@ -125,7 +148,7 @@ describe('AuthService.Login', () => {
   })
 
   it('should throw an error if user not found', async () => {
-    userModelMock.findOne.mockResolvedValue(null)
+    dbInstanceMock.User.findOne.mockResolvedValue(null)
 
     await expect(authService.login('test', 'password123')).rejects.toMatchObject(
       new HTTPException(404, 'User not found')
@@ -133,7 +156,7 @@ describe('AuthService.Login', () => {
   })
 
   it('should throw an error if password mismatch', async () => {
-    userModelMock.findOne.mockResolvedValue({ username: 'test' })
+    dbInstanceMock.User.findOne.mockResolvedValue({ username: 'test' })
     compareMock.mockResolvedValue(false)
 
     await expect(authService.login('test', 'password123')).rejects.toMatchObject(
@@ -142,7 +165,7 @@ describe('AuthService.Login', () => {
   })
 
   it('should throw an error if JWT_SECRET does not defined', async () => {
-    userModelMock.findOne.mockResolvedValue({ username: 'test' })
+    dbInstanceMock.User.findOne.mockResolvedValue({ username: 'test' })
     compareMock.mockResolvedValue(true)
     delete process.env.JWT_SECRET
 

@@ -8,6 +8,12 @@ export default (sequelize, DataTypes) => {
       User.hasMany(models.Order, {
         foreignKey: 'user_id',
       })
+
+      User.belongsToMany(models.Role, {
+        through: 'users_roles',
+        foreignKey: 'user_id',
+        otherKey: 'role_id',
+      })
     }
   }
 

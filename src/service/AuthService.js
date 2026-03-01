@@ -20,7 +20,7 @@ import { initializeRedis } from '../infrastructure/redis.js'
  */
 export async function createAuthService(deps = {}) {
   const {
-    userModel = (await db()).User,
+    dbInstance = await db(),
     loggerInstance = logger,
     redis = await initializeRedis(),
     jwtLib = jwt,
@@ -28,16 +28,18 @@ export async function createAuthService(deps = {}) {
     uuidLib = uuid,
   } = deps
 
+  const { User, Role, sequelize } = dbInstance
+
   return {
     async register(user) {
-      const existedUsername = await userModel.findOne({
+      const existedUsername = await User.findOne({
         where: { username: user.username },
       })
       if (existedUsername !== null) {
         throw new HTTPException(400, 'The username already exists')
       }
 
-      const existedEmail = await userModel.findOne({
+      const existedEmail = await User.findOne({
         where: { email: user.email },
       })
 
@@ -46,11 +48,21 @@ export async function createAuthService(deps = {}) {
       }
 
       loggerInstance.info(`Registering user ${JSON.stringify({ username: user.username, email: user.email })}`)
-      return await userModel.create(user)
+
+      return await sequelize.transaction(async (transaction) => {
+        const [roleUser, newUser] = await Promise.all([
+          Role.findOne({ where: { name: 'USER' }, transaction }),
+          User.create(user, { transaction }),
+        ])
+
+        await newUser.addRole(roleUser, { transaction })
+
+        return newUser
+      })
     },
 
     async login(username, password) {
-      const user = await userModel.findOne({
+      const user = await User.findOne({
         where: { username: username },
       })
       if (user === null) {
