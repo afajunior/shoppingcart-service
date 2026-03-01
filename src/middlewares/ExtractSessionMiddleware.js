@@ -9,7 +9,7 @@ import { logger } from '../infrastructure/logger.js'
  * @param {import('express').NextFunction} next
  * @returns
  */
-export async function auth(request, response, next) {
+export async function extractSession(request, response, next) {
   const redisClient = await initializeRedis()
   const token = request.header('Authorization')?.split(' ')[1]
   if (!token) {

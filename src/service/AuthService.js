@@ -91,10 +91,13 @@ export async function createAuthService(deps = {}) {
       await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
         EX: Number(process.env.CART_EXPIRATION_TIME),
       })
+      const payload = {
+        userId: user.id,
+        roles: (await user.getRoles()).map((r) => r.name),
+        sessionId,
+      }
 
-      return jwtLib.sign({ userId: user.id, sessionId }, process.env.JWT_SECRET, {
-        expiresIn: '2h',
-      })
+      return jwtLib.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' })
     },
 
     async verifyEmail(token) {

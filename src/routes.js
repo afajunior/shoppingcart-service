@@ -13,7 +13,8 @@ import {
   registerSchema,
   verifyEmailSchema,
 } from './infrastructure/validator.js'
-import { auth } from './middlewares/AuthMiddleware.js'
+import { extractSession } from './middlewares/ExtractSessionMiddleware.js'
+import { authorize } from './middlewares/AuthorizationMiddleware.js'
 
 const app = express()
 app.use(express.json())
@@ -24,27 +25,28 @@ const validator = createValidator({})
 app.post('/register', validator.body(registerSchema), authController.register)
 app.post('/login', validator.body(loginSchema), authController.login)
 app.get('/verify-email', validator.body(verifyEmailSchema), authController.verifyEmail)
-app.post('/resend-token', auth, authController.sendVerificationEmail)
+app.post('/resend-token', extractSession, authorize('USER'), authController.sendVerificationEmail)
 
 // Product
-app.get('/product/:id', auth, validator.params(paramSchema), productController.get)
-app.get('/product', auth, validator.query(searchParamsSchema), productController.list)
-app.post('/product', auth, validator.body(productBodySchema), productController.save)
+app.get('/product/:id', extractSession, validator.params(paramSchema), productController.get)
+app.get('/product', extractSession, validator.query(searchParamsSchema), productController.list)
+app.post('/product', extractSession, authorize('ADMIN'), validator.body(productBodySchema), productController.save)
 app.put(
   '/product/:id',
-  auth,
+  extractSession,
+  authorize('ADMIN'),
   validator.params(paramSchema),
   validator.body(productBodySchema),
   productController.update
 )
 
 // Order
-app.get('/order/:id', auth, validator.params(paramSchema), orderController.get)
-app.get('/order', auth, validator.query(searchParamsSchema), orderController.list)
-app.post('/order', auth, orderController.create)
+app.get('/order/:id', extractSession, authorize('USER'), validator.params(paramSchema), orderController.get)
+app.get('/order', extractSession, authorize('USER'), validator.query(searchParamsSchema), orderController.list)
+app.post('/order', extractSession, authorize('USER'), orderController.create)
 
 // Cart
-app.get('/cart', auth, cartController.get)
-app.post('/cart', auth, validator.body(cartBodySchema), cartController.add)
+app.get('/cart', extractSession, authorize('USER'), cartController.get)
+app.post('/cart', extractSession, authorize('USER'), validator.body(cartBodySchema), cartController.add)
 
 export { app }

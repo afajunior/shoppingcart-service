@@ -2,9 +2,7 @@
 import { Model } from 'sequelize'
 
 export default (sequelize, DataTypes) => {
-  class ProductOrder extends Model {
-    static associate(models) {}
-  }
+  class ProductOrder extends Model {}
 
   ProductOrder.init(
     {

@@ -131,6 +131,7 @@ describe('AuthService.Login', () => {
       username: 'test',
       password: 'password123',
       email: 'test@mock.com',
+      getRoles: jest.fn().mockResolvedValue([{ name: 'ROLE_MOCK' }]),
     }
 
     process.env.JWT_SECRET = secretJwt
@@ -139,17 +140,15 @@ describe('AuthService.Login', () => {
     uuidLibMock.mockReturnValueOnce(sessionId)
     dbInstanceMock.User.findOne.mockResolvedValue(newUser)
     compareMock.mockResolvedValue(true)
-    jwtLibMock.sign.mockImplementation(async (obj, secret, opts) => {
-      expect(obj).toMatchObject({ userId, sessionId })
-      expect(secret).toBe(secretJwt)
-      expect(opts).toMatchObject({ expiresIn: '2h' })
-      return expectedToken
-    })
+    jwtLibMock.sign.mockReturnValue(expectedToken)
 
     const token = await authService.login('test', 'password123')
     expect(token).toBe(expectedToken)
     expect(redisMock.set).toHaveBeenCalledWith(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
       EX: Number(process.env.CART_EXPIRATION_TIME),
+    })
+    expect(jwtLibMock.sign).toHaveBeenCalledWith({ userId, sessionId, roles: ['ROLE_MOCK'] }, secretJwt, {
+      expiresIn: '2h',
     })
   })
 
