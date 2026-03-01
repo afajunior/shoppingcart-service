@@ -1,32 +1,36 @@
 type: collection.insomnia.rest/5.0
+schema_version: "5.1"
 name: ShoppingCart
 meta:
-  id: wrk_26ed1905900a42f88129b3bf2eeb79ef
-  created: 1766429169660
-  modified: 1769545845418
+  id: wrk_f8e701a1422d4ffc8857897b43570b24
+  created: 1770437847742
+  modified: 1770437847742
+  description: ""
 collection:
   - name: User
     meta:
-      id: fld_d65b205d974744f79f9cf0770a5c7bf1
+      id: fld_ddcda3ba42ba41fd9293460d13a87962
       created: 1769090272619
       modified: 1769090272619
       sortKey: -1769090272619
+      description: ""
     children:
-      - url: '{{ _.baseurl }}/register'
+      - url: "{{ _.baseurl }}/register"
         name: Register
         meta:
-          id: req_914e3c8bd3b44d3fbdc969f824c64aaa
+          id: req_183314535eea48608b7299f31d74d8bb
           created: 1769087317026
-          modified: 1769549513147
+          modified: 1772362794207
           isPrivate: false
+          description: ""
           sortKey: -1769090276046
         method: POST
         body:
           mimeType: application/json
           text: |-
             {
-            	"username": "user",
-            	"email": "user@test.com",
+            	"username": "user2",
+            	"email": "user2@test.com",
             	"password": "password123"
             }
         headers:
@@ -42,13 +46,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/login'
+      - url: "{{ _.baseurl }}/login"
         name: Login
         meta:
-          id: req_375e4d57bb2646a1acd2eabf1ceca38f
+          id: req_5480649a4ca9406c8cb489ef2867ab6d
           created: 1769090266472
-          modified: 1769549523687
+          modified: 1772368182190
           isPrivate: false
+          description: ""
           sortKey: -1769090275946
         method: POST
         body:
@@ -71,28 +76,22 @@ collection:
             send: true
             store: true
           rebuildPath: true
-  - name: Product
-    meta:
-      id: fld_5e27b96952eb4b8ca2ee46b599378ef0
-      created: 1769090284093
-      modified: 1769090284093
-      sortKey: -1769090284093
-    children:
-      - url: '{{ _.baseurl }}/product/1'
-        name: Get
+      - url: "{{ _.baseurl }}/resend-token"
+        name: SendVerificationEmail
         meta:
-          id: req_c2a91d6905d6434a931b515f746e5a5e
-          created: 1766774646454
-          modified: 1769549501224
+          id: req_9218d5d32b8e4183b5b48a42df51509d
+          created: 1772364124031
+          modified: 1772368162051
           isPrivate: false
-          sortKey: -1769090304832
-        method: GET
+          description: ""
+          sortKey: -1769090275996
+        method: POST
         headers:
           - name: User-Agent
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -102,13 +101,47 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/product'
+  - name: Product
+    meta:
+      id: fld_f471f70ea7c3449f9bd3439fd4209018
+      created: 1769090284093
+      modified: 1769090284093
+      sortKey: -1769090284093
+      description: ""
+    children:
+      - url: "{{ _.baseurl }}/product/1"
+        name: Get
+        meta:
+          id: req_ebdd04a73955471bb8f23879aae2b8e6
+          created: 1766774646454
+          modified: 1772377857312
+          isPrivate: false
+          description: ""
+          sortKey: -1769090304832
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/11.1.0
+        authentication:
+          type: bearer
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
+            'b64::JC50b2tlbg==::46b', 'never', 60 %}"
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}/product"
         name: Create
         meta:
-          id: req_186a39d6568b4d77ae95726ff3acbfed
+          id: req_f0acc15364ad4beb94badf3e66331232
           created: 1766776895668
-          modified: 1769549496916
+          modified: 1771124949796
           isPrivate: false
+          description: ""
           sortKey: -1769090304932
         method: POST
         body:
@@ -117,7 +150,7 @@ collection:
             {
             	"name": "Sample Product 3",
             	"price": 3.99,
-            	"quantity": 10
+            	"quantity": 15
             }
         headers:
           - name: Content-Type
@@ -126,7 +159,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -136,13 +169,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/product/1'
+      - url: "{{ _.baseurl }}/product/9"
         name: Update
         meta:
-          id: req_15a5779acebb4525ad71de6bb7dc4cc5
+          id: req_8bffbab8088b4ea9a8c665bdaa7d4113
           created: 1769028556470
-          modified: 1769549509558
+          modified: 1771172725262
           isPrivate: false
+          description: ""
           sortKey: -1769090304732
         method: PUT
         body:
@@ -150,8 +184,8 @@ collection:
           text: |-
             {
             	"name": "Sample Product 6",
-            	"price": 0.99,
-            	"quantity": 2
+            	"price": 5.99,
+            	"quantity": 21
             }
         headers:
           - name: Content-Type
@@ -160,7 +194,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -170,18 +204,18 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/product'
+      - url: "{{ _.baseurl }}/product"
         name: List
         meta:
-          id: req_6222eb47838b42289815b685d7100dec
+          id: req_809bbd2f873e4b74ad9bd1c37005d9e8
           created: 1769437383286
           modified: 1769549505497
           isPrivate: false
+          description: ""
           sortKey: -1769090304782
         method: GET
         parameters:
-          - id: pair_1b8b3dc32a6741d38e32ac3f4089b755
-            name: sort
+          - name: sort
             value: DESC
             disabled: false
         headers:
@@ -189,7 +223,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -201,26 +235,28 @@ collection:
           rebuildPath: true
   - name: Cart
     meta:
-      id: fld_1cf488f24ae948b69f7a77a27f23cc31
+      id: fld_b94f6674f7ba484b865e00844ad6bc6a
       created: 1769104761897
       modified: 1769104761897
       sortKey: -1769104761897
+      description: ""
     children:
-      - url: '{{ _.baseurl }}/cart'
+      - url: "{{ _.baseurl }}/cart"
         name: Add Product
         meta:
-          id: req_79cf7e35e75f49619480f8b94aa9a1cd
+          id: req_e755f3d47d234fe0b665e875cde462a0
           created: 1769104768771
-          modified: 1769549489208
+          modified: 1771124967670
           isPrivate: false
+          description: ""
           sortKey: -1769104768771
         method: POST
         body:
           mimeType: application/json
           text: |-
             {
-            	"productId": 2,
-            	"quantity": 1
+            	"productId": 7,
+            	"quantity": 5
             }
         headers:
           - name: Content-Type
@@ -229,7 +265,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -239,13 +275,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/cart'
+      - url: "{{ _.baseurl }}/cart"
         name: Get
         meta:
-          id: req_f98b86191d2c4ccaaf7a3f58edffab04
+          id: req_f5c131d9ce2a4a46995d02d4037ef32b
           created: 1769447304921
           modified: 1769549492983
           isPrivate: false
+          description: ""
           sortKey: -1769097536851.5
         method: GET
         headers:
@@ -253,7 +290,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -265,18 +302,20 @@ collection:
           rebuildPath: true
   - name: Order
     meta:
-      id: fld_2c9ed55889214d6cb4ed7c330b2ca32b
+      id: fld_4bae3eab584b49db8eb5b2fc49c45862
       created: 1769536231059
       modified: 1769536231059
       sortKey: -1769536231059
+      description: ""
     children:
-      - url: '{{ _.baseurl }}/order'
+      - url: "{{ _.baseurl }}/order"
         name: Create
         meta:
-          id: req_e4a406e3824248bda58d3566e41939a9
+          id: req_0eb8cb1c7d4c4f658b68c4f4f107028f
           created: 1769447615171
           modified: 1769549471128
           isPrivate: false
+          description: ""
           sortKey: -1769536236258
         method: POST
         headers:
@@ -284,7 +323,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -294,13 +333,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/order'
+      - url: "{{ _.baseurl }}/order"
         name: List
         meta:
-          id: req_48b2b4e149a04a688872dc2fc59986c1
+          id: req_1252d94115bd4b51bf76415172330ea3
           created: 1769536236158
           modified: 1769549476227
           isPrivate: false
+          description: ""
           sortKey: -1769536236158
         method: GET
         headers:
@@ -308,7 +348,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -318,13 +358,14 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: '{{ _.baseurl }}/order/1'
+      - url: "{{ _.baseurl }}/order/19"
         name: Get
         meta:
-          id: req_48565fcbedf44620ac554d72c8822f38
+          id: req_70b73475df3d4693bae368ad84541c5f
           created: 1769537478014
-          modified: 1769549483070
+          modified: 1771172766450
           isPrivate: false
+          description: ""
           sortKey: -1769320502464.5
         method: GET
         headers:
@@ -332,7 +373,7 @@ collection:
             value: insomnia/11.1.0
         authentication:
           type: bearer
-          token: "{% response 'body', 'req_375e4d57bb2646a1acd2eabf1ceca38f',
+          token: "{% response 'body', 'req_5480649a4ca9406c8cb489ef2867ab6d',
             'b64::JC50b2tlbg==::46b', 'never', 60 %}"
         settings:
           renderRequestBody: true
@@ -345,13 +386,13 @@ collection:
 cookieJar:
   name: Default Jar
   meta:
-    id: jar_7ae4b071523434eb9924ce265701175c38445fbc
+    id: jar_2de07091e845490a98b5e040fe4b125a
     created: 1766429169664
     modified: 1766429169664
 environments:
   name: Base Environment
   meta:
-    id: env_7ae4b071523434eb9924ce265701175c38445fbc
+    id: env_ee49a1e3bc8f482ebc3b2f875990092f
     created: 1766429169662
     modified: 1769549457745
     isPrivate: false
