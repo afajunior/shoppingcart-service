@@ -4,8 +4,12 @@ import { join, resolve } from 'path'
 import { readdirSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { createRequire } from 'module'
+import { app } from '../../../src/routes'
+import http from 'http'
+import { closeRedis } from '../../../src/infrastructure/redis'
 
 let sequelize
+let server
 
 const runSeeders = async (direction) => {
   const require = createRequire(import.meta.url)
@@ -25,10 +29,18 @@ const runSeeders = async (direction) => {
 
 beforeAll(async () => {
   sequelize = (await db()).sequelize
+  server = http.createServer(app)
+
+  await new Promise((resolve) => server.listen(0, resolve)) // inicia o servidor
+
+  process.env.TOKEN_EXPIRATION_TIME = 7200000
+  process.env.LOGGER_LEVEL = 'info'
 
   await sequelize.authenticate()
   await sequelize.sync({ force: true })
   await runSeeders('up')
+
+  global.__SERVER__ = server
 })
 
 beforeEach(async () => {
@@ -37,5 +49,7 @@ beforeEach(async () => {
 })
 
 afterAll(async () => {
+  await new Promise((resolve, reject) => server.close((err) => (err ? reject(err) : resolve())))
   await sequelize.close()
+  await closeRedis()
 })

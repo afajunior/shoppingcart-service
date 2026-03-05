@@ -8,9 +8,12 @@ const db = {}
 const modelPath = __dirname + '/../models'
 
 async function initializeDatabase() {
+  const { logger } = await import('./logger')
   const Sequelize = require('sequelize')
 
-  const sequelize = new Sequelize(process.env.DATABASE_URL)
+  const sequelize = new Sequelize(process.env.DATABASE_URL, {
+    logging: (msg) => logger.debug(msg),
+  })
 
   const modelFiles = fs.readdirSync(modelPath).filter((file) => {
     return file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js' && file.indexOf('.test.js') === -1
