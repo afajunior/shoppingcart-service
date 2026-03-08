@@ -56,7 +56,7 @@ export async function login(request, response) {
 export async function verifyEmail(request, response) {
   try {
     const authService = await createAuthService()
-    authService.verifyEmail(request.query.token)
+    await authService.verifyEmail(request.query.token)
     response.status(200).send()
   } catch (error) {
     if (error instanceof HTTPException) {

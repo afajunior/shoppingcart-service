@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { createProductService } from '../src/service/ProductService'
+import { createProductService } from '../../../src/service/ProductService'
 
 const productModelMock = {
   findByPk: jest.fn(),

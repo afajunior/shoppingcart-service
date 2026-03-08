@@ -3,6 +3,7 @@ import { logger } from '../infrastructure/logger.js'
 import { Op } from 'sequelize'
 import db from '../infrastructure/database.cjs'
 import HTTPException from '../error/HTTPException.js'
+import Decimal from 'decimal.js'
 
 /**
  * @typedef Product
@@ -107,7 +108,12 @@ export async function createOrderService(deps = {}) {
         },
       })
 
-      const totalAmount = products.reduce((acc, product) => acc + product.price * product.quantity, 0.0)
+      const totalAmount = products
+        .reduce((acc, product) => {
+          const cartItem = cart.find((item) => product.id === item.productId)
+          return new Decimal(cartItem?.quantity).mul(product.price).add(acc)
+        }, 0.0)
+        .toNumber()
 
       loggerInstance.debug({
         message: 'Processing products in the cart to a new order',

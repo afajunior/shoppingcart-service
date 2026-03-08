@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { createCartService } from '../src/service/CartService'
-import HTTPException from '../src/error/HTTPException'
+import { createCartService } from '../../../src/service/CartService'
+import HTTPException from '../../../src/error/HTTPException'
 
 const findProductMock = jest.fn()
 const setRedisMock = jest.fn()

@@ -1,6 +1,6 @@
 import { describe, expect, it, jest } from '@jest/globals'
-import { createEmailService } from '../src/service/EmailService.js'
-import HTTPException from '../src/error/HTTPException.js'
+import { createEmailService } from '../../../src/service/EmailService.js'
+import HTTPException from '../../../src/error/HTTPException.js'
 
 const sendMailMock = jest.fn().mockResolvedValue({ messageId: '123' })
 const transporterMock = { sendMail: sendMailMock }

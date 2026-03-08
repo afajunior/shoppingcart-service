@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { createOrderService } from '../src/service/OrderService'
+import { createOrderService } from '../../../src/service/OrderService'
 
 const dbInstanceMock = {
   Order: {
@@ -193,14 +193,14 @@ describe('OrderService.Create', () => {
       await args(transactionMock)
 
       expect(dbInstanceMock.Order.create).toHaveBeenCalledWith(
-        { totalAmount: 139.4, user_id: 1 },
+        { totalAmount: 13.94, user_id: 1 },
         { transaction: transactionMock }
       )
       expect(mockOrder.addProduct).toHaveBeenCalledTimes(3)
 
       return {
         id: 1,
-        totalAmount: 139.4,
+        totalAmount: 13.94,
         createdAt,
         addProduct: jest.fn(),
       }

@@ -30,7 +30,7 @@ export async function createCartService(deps = {}) {
 
       if (existingItem.quantity < 1) {
         const itemIdx = cart.indexOf(existingItem)
-        cart.splice(itemIdx)
+        cart.splice(itemIdx, 1)
       } else {
         const product = await productModel.findByPk(productId)
         if (existingItem.quantity > product.quantity) {

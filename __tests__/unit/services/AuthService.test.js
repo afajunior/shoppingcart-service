@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { createAuthService } from '../src/service/AuthService'
-import HTTPException from '../src/error/HTTPException'
+import { createAuthService } from '../../../src/service/AuthService'
+import HTTPException from '../../../src/error/HTTPException'
 
 const dbInstanceMock = {
   User: {

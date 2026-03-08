@@ -34,7 +34,9 @@ beforeAll(async () => {
   await new Promise((resolve) => server.listen(0, resolve)) // inicia o servidor
 
   process.env.TOKEN_EXPIRATION_TIME = 7200000
+  process.env.CART_EXPIRATION_TIME = 7200000
   process.env.LOGGER_LEVEL = 'info'
+  process.env.JWT_SECRET = 'your-256-bit-secret'
 
   await sequelize.authenticate()
   await sequelize.sync({ force: true })
@@ -46,6 +48,8 @@ beforeAll(async () => {
 beforeEach(async () => {
   await sequelize.truncate({ cascade: true, restartIdentity: true })
   await runSeeders('up')
+
+  await fetch(`${process.env.MAIL_API}/api/v1/messages`, { method: 'DELETE' })
 })
 
 afterAll(async () => {

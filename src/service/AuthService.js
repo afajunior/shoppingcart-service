@@ -57,6 +57,10 @@ export async function createAuthService(deps = {}) {
           User.create(user, { transaction }),
         ])
 
+        if (!roleUser) {
+          throw new HTTPException(500, 'Error on create user')
+        }
+
         await newUser.addRole(roleUser, { transaction })
 
         return newUser
