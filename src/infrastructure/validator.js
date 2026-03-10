@@ -16,7 +16,7 @@ export const verifyEmailSchema = Joi.object({
 })
 
 export const searchParamsSchema = Joi.object({
-  order: Joi.string(),
+  order: Joi.string().valid('id', 'createdAt', 'totalAmount', 'name', 'price'),
   sort: Joi.string().valid('ASC', 'DESC'),
   max: Joi.number().positive(),
   offset: Joi.number(),

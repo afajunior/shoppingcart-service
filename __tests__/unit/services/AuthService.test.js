@@ -168,12 +168,4 @@ describe('AuthService.Login', () => {
       new HTTPException(403, 'Invalid credentials')
     )
   })
-
-  it('should throw an error if JWT_SECRET does not defined', async () => {
-    dbInstanceMock.User.findOne.mockResolvedValue({ username: 'test' })
-    compareMock.mockResolvedValue(true)
-    delete process.env.JWT_SECRET
-
-    await expect(authService.login('test', 'password123')).rejects.toThrow('Internal Error Service')
-  })
 })

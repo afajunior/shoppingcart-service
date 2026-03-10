@@ -48,10 +48,6 @@ export async function update(request, response) {
   const productService = await createProductService()
   const id = request.params.id
 
-  if (typeof id !== 'number') {
-    return response.status(400).json({ message: 'Bad Request' })
-  }
-
   const product = request.body
   try {
     const updatedProduct = await productService.update(id, product)

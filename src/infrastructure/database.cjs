@@ -8,7 +8,7 @@ const db = {}
 const modelPath = __dirname + '/../models'
 
 async function initializeDatabase() {
-  const { logger } = await import('./logger')
+  const { logger } = await import('./logger.js')
   const Sequelize = require('sequelize')
 
   const sequelize = new Sequelize(process.env.DATABASE_URL, {

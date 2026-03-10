@@ -11,7 +11,7 @@ export async function initializeRedis() {
     throw Error('REDIS_URL not defined')
   }
 
-  redisClient = createClient(process.env.REDIS_URL)
+  redisClient = createClient({ url: process.env.REDIS_URL })
   redisClient.on('error', (err) => logger.error('Redis Error', err))
   await redisClient.connect()
 

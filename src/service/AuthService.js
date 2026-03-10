@@ -86,11 +86,6 @@ export async function createAuthService(deps = {}) {
 
       loggerInstance.info(`User ${username} authenticated.`)
 
-      if (process.env.JWT_SECRET === undefined) {
-        loggerInstance.error('JWT_SECRET not defined')
-        throw Error('Internal Error Service')
-      }
-
       const sessionId = uuidLib()
       await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
         EX: Number(process.env.CART_EXPIRATION_TIME),

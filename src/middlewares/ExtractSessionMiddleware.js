@@ -34,6 +34,10 @@ export async function extractSession(request, response, next) {
     request.session = { ...payload, sessionData: JSON.parse(sessionData) }
     next()
   } catch (error) {
-    response.status(500).json(error)
+    if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+      return response.status(401).json({ message: 'Invalid token' })
+    }
+    logger.error('Unexpected auth error', error)
+    response.status(500).json({ message: 'Internal Server Error' })
   }
 }

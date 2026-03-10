@@ -15,16 +15,22 @@ import {
 } from './infrastructure/validator.js'
 import { extractSession } from './middlewares/ExtractSessionMiddleware.js'
 import { authorize } from './middlewares/AuthorizationMiddleware.js'
+import cors from 'cors'
 
 const app = express()
 app.use(express.json())
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+)
 
 const validator = createValidator({})
 
 // Auth
 app.post('/register', validator.body(registerSchema), authController.register)
 app.post('/login', validator.body(loginSchema), authController.login)
-app.get('/verify-email', validator.body(verifyEmailSchema), authController.verifyEmail)
+app.get('/verify-email', validator.query(verifyEmailSchema), authController.verifyEmail)
 app.post('/resend-token', extractSession, authorize('USER'), authController.sendVerificationEmail)
 
 // Product

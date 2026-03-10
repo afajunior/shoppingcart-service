@@ -39,7 +39,7 @@ export async function createEmailService(deps = {}) {
 }
 
 function getTemplate(username, token) {
-  const url = `http://localhost:3000/verify-email?token=${token}`
+  const url = `http://${process.env.APP_BASE_URL}/verify-email?token=${token}`
   const expiresInHours = Number(process.env.TOKEN_EXPIRATION_TIME)
   return {
     subject: 'Confirm your email address',

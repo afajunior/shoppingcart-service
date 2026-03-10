@@ -111,6 +111,7 @@ export async function createOrderService(deps = {}) {
       const totalAmount = products
         .reduce((acc, product) => {
           const cartItem = cart.find((item) => product.id === item.productId)
+          if (cartItem === undefined) throw new HTTPException(400, 'Product not in cart')
           return new Decimal(cartItem?.quantity).mul(product.price).add(acc)
         }, 0.0)
         .toNumber()
