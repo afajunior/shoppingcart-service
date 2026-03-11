@@ -166,7 +166,7 @@ describe('OrderService.Create', () => {
       ...expectedOrder,
       addProduct: jest.fn(),
     }
-    process.env.CART_EXPIRATION_TIME = 123456
+    process.env.CART_EXPIRATION_SECONDS = 123456
 
     dbInstanceMock.Product.findAll.mockResolvedValue([
       {
@@ -214,7 +214,7 @@ describe('OrderService.Create', () => {
     expect(dbInstanceMock.Product.findAll).toHaveBeenCalled()
     expect(dbInstanceMock.sequelize.transaction).toHaveBeenCalled()
     expect(redisMock.set).toHaveBeenCalledWith(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
-      EX: Number(process.env.CART_EXPIRATION_TIME),
+      EX: Number(process.env.CART_EXPIRATION_SECONDS),
     })
   })
 

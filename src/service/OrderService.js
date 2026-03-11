@@ -156,7 +156,7 @@ export async function createOrderService(deps = {}) {
       })
 
       await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
-        EX: Number(process.env.CART_EXPIRATION_TIME),
+        EX: Number(process.env.CART_EXPIRATION_SECONDS),
       })
       return await this.get(order.id, userId)
     },

@@ -8,7 +8,7 @@ export async function createEmailService(deps = {}) {
 
   return {
     async sendVerificationEmail(userId) {
-      const expiration = Number(process.env.TOKEN_EXPIRATION_TIME)
+      const expiration = Number(process.env.TOKEN_EXPIRATION_SECONDS)
       const emailVerificationData = {
         emailTokenVerify: randomBytes(32).toString('hex'),
         emailTokenExpiresAt: new Date(Date.now() + expiration),
@@ -40,8 +40,8 @@ export async function createEmailService(deps = {}) {
 
 function getTemplate(username, token) {
   const url = `${process.env.APP_BASE_URL}/verify-email?token=${token}`
-  const expiresInHours = Number(process.env.TOKEN_EXPIRATION_TIME)
-  const hoursDisplay = expiresInHours / 3_600_000
+  const expiresInHours = Number(process.env.TOKEN_EXPIRATION_SECONDS)
+  const hoursDisplay = expiresInHours / 3_600
   return {
     subject: 'Confirm your email address',
     html: `

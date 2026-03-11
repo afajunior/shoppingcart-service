@@ -1,5 +1,3 @@
-import jwt from 'jsonwebtoken'
-
 /**
  *
  * @param {import('express').Request} request

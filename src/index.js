@@ -14,8 +14,8 @@ function validateEnv() {
     'DATABASE_URL',
     'REDIS_URL',
     'APP_BASE_URL',
-    'CART_EXPIRATION_TIME',
-    'TOKEN_EXPIRATION_TIME',
+    'CART_EXPIRATION_SECONDS',
+    'TOKEN_EXPIRATION_SECONDS',
     'CORS_ORIGIN',
   ]
   const missing = REQUIRED.filter((k) => !process.env[k])

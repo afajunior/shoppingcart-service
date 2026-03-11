@@ -88,7 +88,7 @@ export async function createAuthService(deps = {}) {
 
       const sessionId = uuidLib()
       await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
-        EX: Number(process.env.CART_EXPIRATION_TIME),
+        EX: Number(process.env.CART_EXPIRATION_SECONDS),
       })
       const payload = {
         userId: user.id,

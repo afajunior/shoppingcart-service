@@ -1,17 +1,17 @@
-import HTTPException from '../error/HTTPException.js'
 import { createCartService } from '../service/CartService.js'
 
 /**
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
+ * @param {import('express').NextFunction} next
  * @returns {Promise<import('express').Response>}
  */
-export async function get(request, response) {
+export async function get(request, response, next) {
   try {
     return response.json(request.session.sessionData.cart)
   } catch (error) {
-    return response.status(500).json({ message: error.message })
+    next(error)
   }
 }
 
@@ -19,9 +19,10 @@ export async function get(request, response) {
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
+ * @param {import('express').NextFunction} next
  * @returns {Promise<import('express').Response>}
  */
-export async function add(request, response) {
+export async function add(request, response, next) {
   try {
     const cartService = await createCartService()
     const { productId, quantity } = request.body
@@ -29,12 +30,6 @@ export async function add(request, response) {
     const cart = await cartService.add(sessionId, sessionData, productId, quantity)
     return response.json(cart)
   } catch (error) {
-    if (error instanceof HTTPException) {
-      return response.status(error.status).json({ message: error.message })
-    }
-    if (error instanceof Error) {
-      return response.status(500).json({ message: error.message })
-    }
-    return response.status(500).json({ message: 'Unknown Error' })
+    next(error)
   }
 }

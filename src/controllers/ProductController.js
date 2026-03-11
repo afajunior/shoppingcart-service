@@ -3,9 +3,10 @@ import { createProductService } from '../service/ProductService.js'
 /**
  * @param {import('express').Request} request
  * @param {import('express').Response} response
+ * @param {import('express').NextFunction} next
  * @returns {Promise<import('express').Response>}
  */
-export async function get(request, response) {
+export async function get(request, response, next) {
   try {
     const productService = await createProductService()
     const { id } = request.params
@@ -15,7 +16,7 @@ export async function get(request, response) {
     }
     return response.json(product)
   } catch (error) {
-    return response.status(500).json({ message: error.message })
+    next(error)
   }
 }
 
@@ -23,15 +24,17 @@ export async function get(request, response) {
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
+ * @param {import('express').NextFunction} next
  * @returns {Promise<import('express').Response>}
  */
-export async function save(request, response) {
+export async function save(request, response, next) {
   try {
     const productService = await createProductService()
     const product = await productService.save(request.body)
+
     return response.json(product)
   } catch (error) {
-    return response.status(500).json({ message: error.message })
+    next(error)
   }
 }
 
@@ -39,22 +42,23 @@ export async function save(request, response) {
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
+ * @param {import('express').NextFunction} next
  * @returns {Promise<import('express').Response>}
  */
-export async function update(request, response) {
-  const productService = await createProductService()
-  const id = request.params.id
-
-  const product = request.body
+export async function update(request, response, next) {
   try {
+    const id = request.params.id
+    const product = request.body
+    const productService = await createProductService()
     const updatedProduct = await productService.update(id, product)
+
     if (updatedProduct == null) {
       return response.status(404).send()
     }
 
     return response.json(updatedProduct)
   } catch (error) {
-    return response.status(500).json({ message: error.message })
+    next(error)
   }
 }
 
@@ -62,16 +66,17 @@ export async function update(request, response) {
  *
  * @param {import('express').Request} request
  * @param {import('express').Response} response
+ * @param {import('express').NextFunction} next
  * @returns {Promise<import('express').Response>}
  */
-export async function list(request, response) {
+export async function list(request, response, next) {
   try {
     const productService = await createProductService()
     const { order, sort, max, offset } = request.query
-
     const products = await productService.list(order, sort, max, offset)
+
     return response.json(products)
   } catch (error) {
-    return response.status(500).json({ message: error.message })
+    next(error)
   }
 }

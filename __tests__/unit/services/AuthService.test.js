@@ -135,7 +135,7 @@ describe('AuthService.Login', () => {
     }
 
     process.env.JWT_SECRET = secretJwt
-    process.env.CART_EXPIRATION_TIME = 123456
+    process.env.CART_EXPIRATION_SECONDS = 123456
 
     uuidLibMock.mockReturnValueOnce(sessionId)
     dbInstanceMock.User.findOne.mockResolvedValue(newUser)
@@ -145,7 +145,7 @@ describe('AuthService.Login', () => {
     const token = await authService.login('test', 'password123')
     expect(token).toBe(expectedToken)
     expect(redisMock.set).toHaveBeenCalledWith(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
-      EX: Number(process.env.CART_EXPIRATION_TIME),
+      EX: Number(process.env.CART_EXPIRATION_SECONDS),
     })
     expect(jwtLibMock.sign).toHaveBeenCalledWith({ userId, sessionId, roles: ['ROLE_MOCK'] }, secretJwt, {
       expiresIn: '2h',

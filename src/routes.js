@@ -16,6 +16,7 @@ import {
 import { extractSession } from './middlewares/ExtractSessionMiddleware.js'
 import { authorize } from './middlewares/AuthorizationMiddleware.js'
 import cors from 'cors'
+import { errorHandler } from './middlewares/ErrorMiddleware.js'
 
 const origins = (process.env.CORS_ORIGIN || '').split(',')
 
@@ -30,6 +31,7 @@ app.use(
     credentials: true,
   })
 )
+app.use(errorHandler)
 
 const validator = createValidator({})
 
