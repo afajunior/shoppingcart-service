@@ -17,11 +17,17 @@ import { extractSession } from './middlewares/ExtractSessionMiddleware.js'
 import { authorize } from './middlewares/AuthorizationMiddleware.js'
 import cors from 'cors'
 
+const origins = (process.env.CORS_ORIGIN || '').split(',')
+
 const app = express()
 app.use(express.json())
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: (origin, cb) => {
+      if (!origin || origins.includes(origin)) cb(null, true)
+      else cb(new Error('Not allowed by CORS'))
+    },
+    credentials: true,
   })
 )
 

@@ -40,7 +40,9 @@ export async function createCartService(deps = {}) {
 
       loggerInstance.info(`cart: ${JSON.stringify(cart)}`)
 
-      await redis.set(`session:${sessionId}`, JSON.stringify({ cart }), { EX: 60 * 60 * 2 })
+      await redis.set(`session:${sessionId}`, JSON.stringify({ cart }), {
+        EX: Number(process.env.CART_EXPIRATION_TIME),
+      })
 
       return { cart }
     },

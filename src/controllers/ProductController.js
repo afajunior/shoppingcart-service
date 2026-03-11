@@ -9,9 +9,6 @@ export async function get(request, response) {
   try {
     const productService = await createProductService()
     const { id } = request.params
-    if (typeof id !== 'number') {
-      return response.status(400).json({ message: 'Bad Request' })
-    }
     const product = await productService.get(id)
     if (product == null) {
       return response.status(404).json({ error: `Product #${id} not found` })

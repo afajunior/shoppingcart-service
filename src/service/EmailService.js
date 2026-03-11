@@ -39,8 +39,9 @@ export async function createEmailService(deps = {}) {
 }
 
 function getTemplate(username, token) {
-  const url = `http://${process.env.APP_BASE_URL}/verify-email?token=${token}`
+  const url = `${process.env.APP_BASE_URL}/verify-email?token=${token}`
   const expiresInHours = Number(process.env.TOKEN_EXPIRATION_TIME)
+  const hoursDisplay = expiresInHours / 3_600_000
   return {
     subject: 'Confirm your email address',
     html: `
@@ -55,7 +56,7 @@ function getTemplate(username, token) {
         </a>
 
         <p style="color: #6B7280; font-size: 14px;">
-          This link expires in <strong>${expiresInHours / 3600000} hours</strong>.<br/>
+          This link expires in <strong>${hoursDisplay} hours</strong>.<br/>
           If you did not create an account, you can safely ignore this email.
         </p>
 
@@ -65,7 +66,7 @@ function getTemplate(username, token) {
         </p>
       </div>
     `,
-    text: `Hello, ${username}!\n\nPlease confirm your email address by visiting:\n${url}\n\nThis link expires in ${expiresInHours} hours.\n\nIf you did not create an account, you can safely ignore this email.`,
+    text: `Hello, ${username}!\n\nPlease confirm your email address by visiting:\n${url}\n\nThis link expires in ${hoursDisplay} hours.\n\nIf you did not create an account, you can safely ignore this email.`,
   }
 }
 
