@@ -8,7 +8,7 @@ import { logger } from '../infrastructure/logger.js'
  * @param {import('express').NextFunction} next
  * @returns
  */
-export async function errorHandler(error, request, response) {
+export function errorHandler(error, request, response, next) {
   if (error instanceof HTTPException) {
     return response.status(error.status).json({ message: error.message })
   }

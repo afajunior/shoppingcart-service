@@ -31,7 +31,6 @@ app.use(
     credentials: true,
   })
 )
-app.use(errorHandler)
 
 const validator = createValidator({})
 
@@ -62,5 +61,7 @@ app.post('/order', extractSession, authorize('USER'), orderController.create)
 // Cart
 app.get('/cart', extractSession, authorize('USER'), cartController.get)
 app.post('/cart', extractSession, authorize('USER'), validator.body(cartBodySchema), cartController.add)
+
+app.use(errorHandler)
 
 export { app }

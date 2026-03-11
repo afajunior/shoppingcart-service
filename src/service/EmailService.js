@@ -11,7 +11,7 @@ export async function createEmailService(deps = {}) {
       const expiration = Number(process.env.TOKEN_EXPIRATION_SECONDS)
       const emailVerificationData = {
         emailTokenVerify: randomBytes(32).toString('hex'),
-        emailTokenExpiresAt: new Date(Date.now() + expiration),
+        emailTokenExpiresAt: new Date((Date.now() + expiration) * 1000),
         emailVerifyAt: null,
       }
 
