@@ -1,6 +1,6 @@
 import { logger } from '../infrastructure/logger.js'
 import db from '../infrastructure/database.cjs'
-import HTTPException from '../error/HTTPException.js'
+import AppError from '../error/AppException.js'
 
 export async function createProductService(deps = {}) {
   const { productModel = (await db()).Product, loggerInstance = logger } = deps
@@ -49,7 +49,7 @@ export async function createProductService(deps = {}) {
       loggerInstance.info(`Updated product#${id}. Rows updated: ${affectedCount}`)
 
       if (affectedCount[0] === 0) {
-        throw new HTTPException(404, 'Product Not Found')
+        throw new AppError(404, 'Product Not Found')
       }
 
       return await this.get(id)

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { createCartService } from '../../../src/service/CartService'
-import HTTPException from '../../../src/error/HTTPException'
+import AppError from '../../../src/error/AppException'
 
 const findProductMock = jest.fn()
 const setRedisMock = jest.fn()
@@ -57,7 +57,7 @@ describe('CartService.Add', () => {
     findProductMock.mockResolvedValue({ quantity: 5 })
 
     await expect(cartService.add(sessionId, sessionData, productId, quantity)).rejects.toMatchObject(
-      new HTTPException(400, 'Quantity exceed local inventory')
+      new AppError(400, 'Quantity exceed local inventory')
     )
     expect(findProductMock).toHaveBeenCalled()
   })

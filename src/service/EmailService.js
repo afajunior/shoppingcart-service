@@ -1,5 +1,5 @@
 import db from '../infrastructure/database.cjs'
-import HTTPException from '../error/HTTPException.js'
+import AppError from '../error/AppException.js'
 import { randomBytes } from 'crypto'
 import { createTransport } from 'nodemailer'
 
@@ -21,7 +21,7 @@ export async function createEmailService(deps = {}) {
         },
       })
       if (count === 0) {
-        throw new HTTPException(404, 'User not found')
+        throw new AppError(404, 'User not found')
       }
 
       const user = await User.findByPk(userId)

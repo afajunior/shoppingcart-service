@@ -18,7 +18,8 @@ export default (sequelize, DataTypes) => {
   Order.init(
     {
       totalAmount: {
-        type: DataTypes.DOUBLE,
+        type: DataTypes.DECIMAL(0, 2),
+        allowNull: false,
       },
       status: {
         type: DataTypes.ENUM,

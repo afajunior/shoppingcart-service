@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { initializeRedis } from '../infrastructure/redis.js'
 import { logger } from '../infrastructure/logger.js'
+import { getSession } from '../infrastructure/session.js'
 
 /**
  *
@@ -19,8 +20,7 @@ export async function extractSession(request, response, next) {
   try {
     /** @type {{userId: number, sessionId: string, sessionData: {cart: {productId: number, quantity: number}[]}}} */
     const payload = jwt.verify(token, process.env.JWT_SECRET)
-    const sessionKey = `session:${payload.sessionId}`
-    const sessionData = await redisClient.get(sessionKey)
+    const sessionData = getSession(redisClient, payload.sessionId)
 
     if (!sessionData) {
       return response.status(401).json({ message: 'Expired session' })

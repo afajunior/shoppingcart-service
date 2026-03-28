@@ -1,7 +1,8 @@
-import HTTPException from '../error/HTTPException.js'
 import { logger } from '../infrastructure/logger.js'
 import { initializeRedis } from '../infrastructure/redis.js'
 import db from '../infrastructure/database.cjs'
+import { setSession } from '../infrastructure/session.js'
+import AppError from '../error/AppException.js'
 
 /**
  * @typedef {productId: number, quantity: number} cartItem
@@ -34,15 +35,13 @@ export async function createCartService(deps = {}) {
       } else {
         const product = await productModel.findByPk(productId)
         if (existingItem.quantity > product.quantity) {
-          throw new HTTPException(400, 'Quantity exceed local inventory')
+          throw new AppError(400, 'Quantity exceed local inventory')
         }
       }
 
       loggerInstance.info(`cart: ${JSON.stringify(cart)}`)
 
-      await redis.set(`session:${sessionId}`, JSON.stringify({ cart }), {
-        EX: Number(process.env.CART_EXPIRATION_SECONDS),
-      })
+      setSession(redis, sessionId, { cart })
 
       return { cart }
     },

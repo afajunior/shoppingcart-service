@@ -2,8 +2,9 @@ import { initializeRedis } from '../infrastructure/redis.js'
 import { logger } from '../infrastructure/logger.js'
 import { Op } from 'sequelize'
 import db from '../infrastructure/database.cjs'
-import HTTPException from '../error/HTTPException.js'
 import Decimal from 'decimal.js'
+import { setSession } from '../infrastructure/session.js'
+import AppError from '../error/AppException.js'
 
 /**
  * @typedef Product
@@ -44,7 +45,7 @@ export async function createOrderService(deps = {}) {
         },
       })
       if (order === null) {
-        throw new HTTPException(404, 'Order not found')
+        throw new AppError(404, 'Order not found')
       }
 
       return {
@@ -93,11 +94,11 @@ export async function createOrderService(deps = {}) {
       const cart = sessionData.cart
 
       if (!cart) {
-        throw new HTTPException(404, 'Cart not found')
+        throw new AppError(404, 'Cart not found')
       }
 
       if (cart.length === 0) {
-        throw new HTTPException(400, 'Empty Cart')
+        throw new AppError(400, 'Empty Cart')
       }
 
       const products = await Product.findAll({
@@ -111,7 +112,7 @@ export async function createOrderService(deps = {}) {
       const totalAmount = products
         .reduce((acc, product) => {
           const cartItem = cart.find((item) => product.id === item.productId)
-          if (cartItem === undefined) throw new HTTPException(400, 'Product not in cart')
+          if (cartItem === undefined) throw new AppError(400, 'Product not in cart')
           return new Decimal(cartItem?.quantity).mul(product.price).add(acc)
         }, 0.0)
         .toNumber()
@@ -154,10 +155,7 @@ export async function createOrderService(deps = {}) {
 
         return newOrder
       })
-
-      await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
-        EX: Number(process.env.CART_EXPIRATION_SECONDS),
-      })
+      setSession(redis, sessionId, { cart: [] })
       return await this.get(order.id, userId)
     },
   }

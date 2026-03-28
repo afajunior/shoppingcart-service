@@ -1,11 +1,12 @@
 import { compare } from 'bcrypt'
 import { logger } from '../infrastructure/logger.js'
 import db from '../infrastructure/database.cjs'
-import HTTPException from '../error/HTTPException.js'
+import AppError from '../error/AppException.js'
 import jwt from 'jsonwebtoken'
 import { v4 as uuid } from 'uuid'
 import { initializeRedis } from '../infrastructure/redis.js'
 import { createEmailService } from './EmailService.js'
+import { setSession } from '../infrastructure/session.js'
 
 /**
  * @typedef dependency
@@ -38,7 +39,7 @@ export async function createAuthService(deps = {}) {
         where: { username: user.username },
       })
       if (existedUsername !== null) {
-        throw new HTTPException(400, 'The username already exists')
+        throw new AppError(400, 'The username already exists')
       }
 
       const existedEmail = await User.findOne({
@@ -46,7 +47,7 @@ export async function createAuthService(deps = {}) {
       })
 
       if (existedEmail !== null) {
-        throw new HTTPException(400, 'This email is already registered')
+        throw new AppError(400, 'This email is already registered')
       }
 
       loggerInstance.info(`Registering user ${JSON.stringify({ username: user.username, email: user.email })}`)
@@ -58,7 +59,7 @@ export async function createAuthService(deps = {}) {
         ])
 
         if (!roleUser) {
-          throw new HTTPException(500, 'Error on create user')
+          throw new AppError(500, 'Error on create user')
         }
 
         await newUser.addRole(roleUser, { transaction })
@@ -76,20 +77,18 @@ export async function createAuthService(deps = {}) {
         where: { username: username },
       })
       if (user === null) {
-        throw new HTTPException(404, 'User not found')
+        throw new AppError(404, 'User not found')
       }
 
       const isMatch = await compareLib(password, user.password)
       if (!isMatch) {
-        throw new HTTPException(403, 'Invalid credentials')
+        throw new AppError(403, 'Invalid credentials')
       }
 
       loggerInstance.info(`User ${username} authenticated.`)
 
       const sessionId = uuidLib()
-      await redis.set(`session:${sessionId}`, JSON.stringify({ cart: [] }), {
-        EX: Number(process.env.CART_EXPIRATION_SECONDS),
-      })
+      setSession(redis, sessionId, { cart: [] })
       const payload = {
         userId: user.id,
         roles: (await user.getRoles()).map((r) => r.name),
@@ -105,15 +104,15 @@ export async function createAuthService(deps = {}) {
       })
 
       if (!user) {
-        throw new HTTPException(404, 'Invalid token')
+        throw new AppError(404, 'Invalid token')
       }
 
       if (user.emailVerifyAt) {
-        throw new HTTPException(409, 'Email already verified')
+        throw new AppError(409, 'Email already verified')
       }
 
       if (new Date() > user.emailTokenExpiresAt) {
-        throw new HTTPException(410, 'Token expired')
+        throw new AppError(410, 'Token expired')
       }
 
       await user.update({

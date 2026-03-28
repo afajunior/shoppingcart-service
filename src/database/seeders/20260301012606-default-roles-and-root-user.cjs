@@ -10,7 +10,7 @@ module.exports = {
     const [roles] = await queryInterface.sequelize.query(`SELECT id FROM roles WHERE name = 'ADMIN' LIMIT 1`)
     const adminRoleId = roles[0].id
 
-    const password = await hash('root', 10)
+    const password = await hash('toorroot', 10)
     await queryInterface.bulkInsert('users', [
       {
         username: 'root',

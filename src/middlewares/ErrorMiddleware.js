@@ -1,4 +1,4 @@
-import HTTPException from '../error/HTTPException.js'
+import AppError from '../error/AppException.js'
 import { logger } from '../infrastructure/logger.js'
 
 /**
@@ -9,7 +9,7 @@ import { logger } from '../infrastructure/logger.js'
  * @returns
  */
 export function errorHandler(error, request, response, next) {
-  if (error instanceof HTTPException) {
+  if (error instanceof AppError) {
     return response.status(error.status).json({ message: error.message })
   }
   logger.error({ path: request.path, message: error.message })

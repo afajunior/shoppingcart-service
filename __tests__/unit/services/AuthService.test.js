@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { createAuthService } from '../../../src/service/AuthService'
-import HTTPException from '../../../src/error/HTTPException'
+import AppError from '../../../src/error/AppException'
 
 const dbInstanceMock = {
   User: {
@@ -100,7 +100,7 @@ describe('AuthService.Register', () => {
     }
 
     await expect(authService.register(duplicateUsername)).rejects.toMatchObject(
-      new HTTPException(400, 'The username already exists')
+      new AppError(400, 'The username already exists')
     )
     expect(dbInstanceMock.User.create).not.toHaveBeenCalled()
   })
@@ -111,9 +111,16 @@ describe('AuthService.Register', () => {
     }
 
     await expect(authService.register(duplicateEmail)).rejects.toMatchObject(
-      new HTTPException(400, 'This email is already registered')
+      new AppError(400, 'This email is already registered')
     )
     expect(dbInstanceMock.User.create).not.toHaveBeenCalled()
+  })
+
+  it('should throw an error if role USER does not exist', async () => {
+    dbInstanceMock.Role.findOne.mockResolvedValue(undefined)
+    await expect(authService.register({ username: 'test', email: 'test@example.com' })).rejects.toMatchObject(
+      new AppError(500, 'Error on create user')
+    )
   })
 })
 describe('AuthService.Login', () => {
@@ -155,9 +162,7 @@ describe('AuthService.Login', () => {
   it('should throw an error if user not found', async () => {
     dbInstanceMock.User.findOne.mockResolvedValue(null)
 
-    await expect(authService.login('test', 'password123')).rejects.toMatchObject(
-      new HTTPException(404, 'User not found')
-    )
+    await expect(authService.login('test', 'password123')).rejects.toMatchObject(new AppError(404, 'User not found'))
   })
 
   it('should throw an error if password mismatch', async () => {
@@ -165,7 +170,7 @@ describe('AuthService.Login', () => {
     compareMock.mockResolvedValue(false)
 
     await expect(authService.login('test', 'password123')).rejects.toMatchObject(
-      new HTTPException(403, 'Invalid credentials')
+      new AppError(403, 'Invalid credentials')
     )
   })
 })
