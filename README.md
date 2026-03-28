@@ -102,20 +102,30 @@ The server starts on the port defined in `PORT` (default `3000`) with file watch
 
 ---
 
+## API collection
+
+The repository includes `insomnia-collections.yaml`, a ready-to-use request collection with all endpoints pre-configured.
+
+### Insomnia
+
+Import directly via **File → Import** and select the file. The collection uses an environment variable `baseurl`, set it to `http://localhost:3000` (or your deployed URL) in your Insomnia environment before running requests.
+
+---
+
 ## npm scripts
 
-| Script                              | What it does                                                                                                                                                                                                               |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm start`                         | Starts the server with `--watch` (auto-restart on changes), loads `.env` via dotenv, and bootstraps OpenTelemetry tracing before any application code runs.                                                                |
-| `npm run format`                    | Formats all files with Prettier.                                                                                                                                                                                           |
-| `npm run lint`                      | Runs ESLint across the project.                                                                                                                                                                                            |
-| `npm run lint:fix`                  | Runs ESLint and auto-fixes what it can.                                                                                                                                                                                    |
-| `npm run test:unit`                 | Runs unit tests in `__tests__/unit`. No external services required, all dependencies are mocked.                                                                                                                           |
-| `npm run test:unit:coverage`        | Same as above, with a coverage report.                                                                                                                                                                                     |
-| `npm run test:integration`          | Runs integration tests in `__tests__/integration`. Spins up real PostgreSQL and Redis instances via Testcontainers (requires Docker). Tests run serially (`--runInBand`) to avoid port conflicts between containers. (WIP) |
-| `npm run test:integration:coverage` | Same as above, with a coverage report.                                                                                                                                                                                     |
-| `npm run db:migrate`                | Applies pending Sequelize migrations against the database configured in `.env`.                                                                                                                                            |
-| `npm run db:migrate:generate`       | Generates a new empty migration file. Usage: `npm run db:migrate:generate -- --name describe-the-change`.                                                                                                                  |
+| Script                              | What it does                                                                                                                                                                                                         |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm start`                         | Starts the server with `--watch` (auto-restart on changes), loads `.env` via dotenv, and bootstraps OpenTelemetry tracing before any application code runs.                                                          |
+| `npm run format`                    | Formats all files with Prettier.                                                                                                                                                                                     |
+| `npm run lint`                      | Runs ESLint across the project.                                                                                                                                                                                      |
+| `npm run lint:fix`                  | Runs ESLint and auto-fixes what it can.                                                                                                                                                                              |
+| `npm run test:unit`                 | Runs unit tests in `__tests__/unit`. No external services required — all dependencies are mocked.                                                                                                                    |
+| `npm run test:unit:coverage`        | Same as above, with a coverage report.                                                                                                                                                                               |
+| `npm run test:integration`          | Runs integration tests in `__tests__/integration`. Spins up real PostgreSQL and Redis instances via Testcontainers (requires Docker). Tests run serially (`--runInBand`) to avoid port conflicts between containers. |
+| `npm run test:integration:coverage` | Same as above, with a coverage report.                                                                                                                                                                               |
+| `npm run db:migrate`                | Applies pending Sequelize migrations against the database configured in `.env`.                                                                                                                                      |
+| `npm run db:migrate:generate`       | Generates a new empty migration file. Usage: `npm run db:migrate:generate -- --name describe-the-change`.                                                                                                            |
 
 ---
 
