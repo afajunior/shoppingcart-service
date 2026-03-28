@@ -11,7 +11,7 @@ import { getSession } from '../infrastructure/session.js'
  * @returns
  */
 export async function extractSession(request, response, next) {
-  const redisClient = await initializeRedis()
+  const redisClient = request.app.locals.redis
   const token = request.header('Authorization')?.split(' ')[1]
   if (!token) {
     return response.status(401).json({ message: 'Access denied. No token provided' })
@@ -26,7 +26,7 @@ export async function extractSession(request, response, next) {
       return response.status(401).json({ message: 'Expired session' })
     }
 
-    request.session = { ...payload, sessionData: sessionData }
+    request.session = { ...payload, sessionData }
     next()
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {

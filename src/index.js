@@ -10,7 +10,7 @@ import { createProductService } from './service/ProductService.js'
 
 validateEnv()
 
-app.locals.services = await initializeInfrastructure()
+app.locals = await initializeInfrastructure()
 
 const port = process.env.PORT || 3000
 
@@ -39,10 +39,13 @@ async function initializeInfrastructure() {
   const redisInstance = await initializeRedis()
   const email = await createEmailService({ dbInstance })
   return {
-    cart: await createCartService({ redis: redisInstance, dbInstance }),
-    order: await createOrderService({ redis: redisInstance, dbInstance }),
-    product: await createProductService({ dbInstance }),
-    email,
-    auth: await createAuthService({ redis: redisInstance, dbInstance, email }),
+    redis: redisInstance,
+    services: {
+      cart: await createCartService({ redis: redisInstance, dbInstance }),
+      order: await createOrderService({ redis: redisInstance, dbInstance }),
+      product: await createProductService({ dbInstance }),
+      email,
+      auth: await createAuthService({ redis: redisInstance, dbInstance, email }),
+    },
   }
 }
