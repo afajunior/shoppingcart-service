@@ -20,18 +20,13 @@ export async function extractSession(request, response, next) {
   try {
     /** @type {{userId: number, sessionId: string, sessionData: {cart: {productId: number, quantity: number}[]}}} */
     const payload = jwt.verify(token, process.env.JWT_SECRET)
-    const sessionData = getSession(redisClient, payload.sessionId)
+    const sessionData = await getSession(redisClient, payload.sessionId)
 
     if (!sessionData) {
       return response.status(401).json({ message: 'Expired session' })
     }
 
-    if (typeof sessionData !== 'string') {
-      logger.error('Invalid session data')
-      return response.status(500).json({ message: 'Interval Service Error' })
-    }
-
-    request.session = { ...payload, sessionData: JSON.parse(sessionData) }
+    request.session = { ...payload, sessionData: sessionData }
     next()
   } catch (error) {
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {

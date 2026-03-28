@@ -22,10 +22,11 @@ module.exports = {
 
   async down(queryInterface) {
     await queryInterface.changeColumn('products', 'price', {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.FLOAT,
       allowNull: true,
     })
     await queryInterface.changeColumn('products', 'quantity', {
+      type: DataTypes.INTEGER,
       allowNull: true,
       defaultValue: null,
     })

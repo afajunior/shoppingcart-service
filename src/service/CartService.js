@@ -41,7 +41,7 @@ export async function createCartService(deps = {}) {
 
       loggerInstance.info(`cart: ${JSON.stringify(cart)}`)
 
-      setSession(redis, sessionId, { cart })
+      await setSession(redis, sessionId, { cart })
 
       return { cart }
     },

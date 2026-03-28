@@ -155,7 +155,7 @@ export async function createOrderService(deps = {}) {
 
         return newOrder
       })
-      setSession(redis, sessionId, { cart: [] })
+      await setSession(redis, sessionId, { cart: [] })
       return await this.get(order.id, userId)
     },
   }

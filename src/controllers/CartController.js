@@ -1,5 +1,3 @@
-import { createCartService } from '../service/CartService.js'
-
 /**
  *
  * @param {import('express').Request} request
@@ -24,7 +22,7 @@ export async function get(request, response, next) {
  */
 export async function add(request, response, next) {
   try {
-    const cartService = await createCartService()
+    const { cart: cartService } = request.app.locals.services
     const { productId, quantity } = request.body
     const { sessionId, sessionData } = request.session
     const cart = await cartService.add(sessionId, sessionData, productId, quantity)

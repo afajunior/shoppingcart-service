@@ -1,5 +1,3 @@
-import { createProductService } from '../service/ProductService.js'
-
 /**
  * @param {import('express').Request} request
  * @param {import('express').Response} response
@@ -8,7 +6,7 @@ import { createProductService } from '../service/ProductService.js'
  */
 export async function get(request, response, next) {
   try {
-    const productService = await createProductService()
+    const { product: productService } = request.app.locals.services
     const { id } = request.params
     const product = await productService.get(id)
     if (product == null) {
@@ -29,7 +27,7 @@ export async function get(request, response, next) {
  */
 export async function save(request, response, next) {
   try {
-    const productService = await createProductService()
+    const { product: productService } = request.app.locals.services
     const product = await productService.save(request.body)
 
     return response.json(product)
@@ -49,7 +47,7 @@ export async function update(request, response, next) {
   try {
     const id = request.params.id
     const product = request.body
-    const productService = await createProductService()
+    const { product: productService } = request.app.locals.services
     const updatedProduct = await productService.update(id, product)
 
     if (updatedProduct == null) {
@@ -71,7 +69,7 @@ export async function update(request, response, next) {
  */
 export async function list(request, response, next) {
   try {
-    const productService = await createProductService()
+    const { product: productService } = request.app.locals.services
     const { order, sort, max, offset } = request.query
     const products = await productService.list(order, sort, max, offset)
 

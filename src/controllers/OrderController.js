@@ -1,5 +1,3 @@
-import { createOrderService } from '../service/OrderService.js'
-
 /**
  *
  * @param {import("express").Request} request
@@ -9,7 +7,7 @@ import { createOrderService } from '../service/OrderService.js'
  */
 export async function create(request, response, next) {
   try {
-    const orderService = await createOrderService()
+    const { order: orderService } = request.app.locals.services
     const { sessionId, sessionData, userId } = request.session
     const order = await orderService.create(sessionId, sessionData, userId)
     return response.json(order)
@@ -27,7 +25,7 @@ export async function create(request, response, next) {
  */
 export async function get(request, response, next) {
   try {
-    const orderService = await createOrderService()
+    const { order: orderService } = request.app.locals.services
     const { id } = request.params
     const { userId } = request.session
     const order = await orderService.get(id, userId)
@@ -46,7 +44,7 @@ export async function get(request, response, next) {
  */
 export async function list(request, response, next) {
   try {
-    const orderService = await createOrderService()
+    const { order: orderService } = request.app.locals.services
     const { userId } = request.session
     const { order, sort, max, offset } = request.query
     const orders = await orderService.list(userId, order, sort, max, offset)

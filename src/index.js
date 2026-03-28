@@ -37,11 +37,12 @@ function validateEnv() {
 async function initializeInfrastructure() {
   const dbInstance = await initializeDatabase()
   const redisInstance = await initializeRedis()
+  const email = await createEmailService({ dbInstance })
   return {
-    auth: createAuthService({ redis: redisInstance, dbInstance }),
-    cart: createCartService({ redis: redisInstance, dbInstance }),
-    order: createOrderService({ redis: redisInstance, dbInstance }),
-    product: createProductService({ dbInstance }),
-    email: createEmailService({ dbInstance }),
+    cart: await createCartService({ redis: redisInstance, dbInstance }),
+    order: await createOrderService({ redis: redisInstance, dbInstance }),
+    product: await createProductService({ dbInstance }),
+    email,
+    auth: await createAuthService({ redis: redisInstance, dbInstance, email }),
   }
 }

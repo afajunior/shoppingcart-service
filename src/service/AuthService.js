@@ -5,7 +5,6 @@ import AppError from '../error/AppException.js'
 import jwt from 'jsonwebtoken'
 import { v4 as uuid } from 'uuid'
 import { initializeRedis } from '../infrastructure/redis.js'
-import { createEmailService } from './EmailService.js'
 import { setSession } from '../infrastructure/session.js'
 
 /**
@@ -28,7 +27,7 @@ export async function createAuthService(deps = {}) {
     jwtLib = jwt,
     compareLib = compare,
     uuidLib = uuid,
-    emailService = await createEmailService(),
+    emailService,
   } = deps
 
   const { User, Role, sequelize } = dbInstance
@@ -88,7 +87,7 @@ export async function createAuthService(deps = {}) {
       loggerInstance.info(`User ${username} authenticated.`)
 
       const sessionId = uuidLib()
-      setSession(redis, sessionId, { cart: [] })
+      await setSession(redis, sessionId, { cart: [] })
       const payload = {
         userId: user.id,
         roles: (await user.getRoles()).map((r) => r.name),
