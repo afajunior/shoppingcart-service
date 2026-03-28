@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import { initializeRedis } from '../infrastructure/redis.js'
 import { logger } from '../infrastructure/logger.js'
 import { getSession } from '../infrastructure/session.js'
 
