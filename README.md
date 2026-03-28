@@ -104,18 +104,18 @@ The server starts on the port defined in `PORT` (default `3000`) with file watch
 
 ## npm scripts
 
-| Script                              | What it does                                                                                                                                                                                                         |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm start`                         | Starts the server with `--watch` (auto-restart on changes), loads `.env` via dotenv, and bootstraps OpenTelemetry tracing before any application code runs.                                                          |
-| `npm run format`                    | Formats all files with Prettier.                                                                                                                                                                                     |
-| `npm run lint`                      | Runs ESLint across the project.                                                                                                                                                                                      |
-| `npm run lint:fix`                  | Runs ESLint and auto-fixes what it can.                                                                                                                                                                              |
-| `npm run test:unit`                 | Runs unit tests in `__tests__/unit`. No external services required — all dependencies are mocked.                                                                                                                    |
-| `npm run test:unit:coverage`        | Same as above, with a coverage report.                                                                                                                                                                               |
-| `npm run test:integration`          | Runs integration tests in `__tests__/integration`. Spins up real PostgreSQL and Redis instances via Testcontainers (requires Docker). Tests run serially (`--runInBand`) to avoid port conflicts between containers. |
-| `npm run test:integration:coverage` | Same as above, with a coverage report.                                                                                                                                                                               |
-| `npm run db:migrate`                | Applies pending Sequelize migrations against the database configured in `.env`.                                                                                                                                      |
-| `npm run db:migrate:generate`       | Generates a new empty migration file. Usage: `npm run db:migrate:generate -- --name describe-the-change`.                                                                                                            |
+| Script                              | What it does                                                                                                                                                                                                               |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm start`                         | Starts the server with `--watch` (auto-restart on changes), loads `.env` via dotenv, and bootstraps OpenTelemetry tracing before any application code runs.                                                                |
+| `npm run format`                    | Formats all files with Prettier.                                                                                                                                                                                           |
+| `npm run lint`                      | Runs ESLint across the project.                                                                                                                                                                                            |
+| `npm run lint:fix`                  | Runs ESLint and auto-fixes what it can.                                                                                                                                                                                    |
+| `npm run test:unit`                 | Runs unit tests in `__tests__/unit`. No external services required, all dependencies are mocked.                                                                                                                           |
+| `npm run test:unit:coverage`        | Same as above, with a coverage report.                                                                                                                                                                                     |
+| `npm run test:integration`          | Runs integration tests in `__tests__/integration`. Spins up real PostgreSQL and Redis instances via Testcontainers (requires Docker). Tests run serially (`--runInBand`) to avoid port conflicts between containers. (WIP) |
+| `npm run test:integration:coverage` | Same as above, with a coverage report.                                                                                                                                                                                     |
+| `npm run db:migrate`                | Applies pending Sequelize migrations against the database configured in `.env`.                                                                                                                                            |
+| `npm run db:migrate:generate`       | Generates a new empty migration file. Usage: `npm run db:migrate:generate -- --name describe-the-change`.                                                                                                                  |
 
 ---
 
@@ -152,7 +152,7 @@ src/
 
 ### Factory functions for services
 
-Each service is created by a `createXxxService(deps = {})` factory that accepts its dependencies as an explicit object. This makes the dependency graph visible and keeps services testable without mocking module imports — unit tests simply pass in mock objects:
+Each service is created by a `createXxxService(deps = {})` factory that accepts its dependencies as an explicit object. This makes the dependency graph visible and keeps services testable without mocking module imports, unit tests simply pass in mock objects:
 
 ```js
 const authService = await createAuthService({
@@ -162,7 +162,7 @@ const authService = await createAuthService({
 })
 ```
 
-The alternative — importing and calling `initializeRedis()` or `db()` directly inside each service — would scatter infrastructure calls throughout the codebase and make it impossible to test services without a real database or Redis connection.
+The alternative, importing and calling `initializeRedis()` or `db()` directly inside each service, would scatter infrastructure calls throughout the codebase and make it impossible to test services without a real database or Redis connection.
 
 ### Explicit DI via app.locals
 
@@ -190,7 +190,7 @@ try {
 
 The JWT payload contains only `userId`, `roles`, and a `sessionId` UUID. The actual session data (the cart) lives in Redis under the key `session:{sessionId}` with a configurable TTL. This means:
 
-- Logout is reliable — deleting the Redis key immediately invalidates the token regardless of its expiry time.
+- Logout is reliable, deleting the Redis key immediately invalidates the token regardless of its expiry time.
 - The cart can grow without affecting the JWT size.
 - Server-side session state can be inspected, modified, or cleared by an operator.
 
@@ -198,7 +198,7 @@ The JWT payload contains only `userId`, `roles`, and a `sessionId` UUID. The act
 
 ### Two-phase middleware for auth
 
-`extractSession` (authentication) runs first: it verifies the JWT signature and hydrates `request.session` with the payload and the cart from Redis. `authorize(...roles)` (authorization) runs second and simply reads `request.session.roles` — it does not touch the JWT again. Separating these concerns makes it easy to add new protected routes without duplicating cryptographic work.
+`extractSession` (authentication) runs first: it verifies the JWT signature and hydrates `request.session` with the payload and the cart from Redis. `authorize(...roles)` (authorization) runs second and simply reads `request.session.roles` does not touch the JWT again. Separating these concerns makes it easy to add new protected routes without duplicating cryptographic work.
 
 ### Decimal.js for monetary calculations
 
